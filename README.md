@@ -12,6 +12,8 @@ Educational repo exploring Go runtime internals — one topic per standalone `ma
 | `goscheduler(GMP Model)/` | G (goroutine), M (OS thread), P (logical processor), netpoller, hand-off |
 | `channel-internals/` | `hchan` struct, circular ring buffer, sendq/recvq, direct-copy optimization, close semantics |
 | `garbage_collection_mechanidm/` | Tri-color concurrent mark & sweep, write barrier, `runtime.GC()` |
+| `bypassing_gc/` | `sync.Pool` GC bypass for high-throughput, reuse pattern |
+| `defer_panic_recover_internal/` | `_defer` struct, panic/recover internals, stack-allocated defer |
 
 ## Run
 
@@ -22,3 +24,7 @@ go run ./mapsgo
 ```
 
 No `go.mod` — every directory is a standalone `package main`.
+
+## System Design Interview Q&A
+
+Also contains [docs/](./docs) — 110 system design interview questions covering 11 chapters from the "Designing Data-Intensive Applications" problem set (Rate Limiter, Consistent Hashing, Key-Value Store, Unique ID Generator, URL Shortener, Web Crawler, Notification System, News Feed, Chat, Search Autocomplete, YouTube). Generated from an external question bank.
