@@ -2,111 +2,41 @@
 
 ## Q1: When utilizing a Twitter Snowflake-like architecture for distributed ID generation, what is the primary risk associated with system clock drift (e.g., via Network Time Protocol corrections), and how is it typically mitigated?
 
-**Options:**
-
-- Clock drift can cause sequence number exhaustion; it is mitigated by allocating more bits to the sequence field dynamically.
-- Clock drift moving backwards can cause duplicate ID generation; it is mitigated by having the application server reject or stall requests until the actual clock catches up to the last saved timestamp.
-- Clock drift causes network split-brains; it is mitigated by implementing a Raft consensus check before every ID allocation.
-- Clock drift causes database index fragmentation; it is mitigated by moving to a UUIDv4 fallback mechanism.
-
 **Answer:** Clock drift moving backwards can cause duplicate ID generation; it is mitigated by having the application server reject or stall requests until the actual clock catches up to the last saved timestamp.
 
 ## Q2: In a high-throughput, B-Tree indexed relational database system, why is using a standard UUIDv4 as a primary key heavily discouraged at Staff level architecture?
-
-**Options:**
-
-- UUIDv4 contains characters that cannot be encoded effectively into typical database collations.
-- The lack of chronological ordering in UUIDv4 causes random insertion locations within a B-Tree index, leading to frequent page splits and heavy disk I/O operations.
-- UUIDv4 generation algorithms rely on centralized lock mechanisms that become a bottleneck across distributed application nodes.
-- UUIDv4 keys exhibit a high mathematical probability of collision within a single data center when scaling past 10,000 requests per second.
 
 **Answer:** The lack of chronological ordering in UUIDv4 causes random insertion locations within a B-Tree index, leading to frequent page splits and heavy disk I/O operations.
 
 ## Q3: Assume you design a centralized Ticket Server approach using Redis (INCR) to yield IDs. Which trade-off are you prioritizing according to the CAP theorem during a cross-datacenter network partition?
 
-**Options:**
-
-- Availability (AP), since any application node can fulfill writes locally using stale cache structures.
-- Consistency (CP), because isolated application nodes that lose connectivity to the centralized Redis cluster will fail to obtain IDs, sacrificing availability to prevent duplicate states.
-- Partition Tolerance is discarded entirely, meaning the system operates as a single-node monolithic state machine.
-- Both Consistency and Availability are preserved via a multi-master lazy replication model.
-
 **Answer:** Consistency (CP), because isolated application nodes that lose connectivity to the centralized Redis cluster will fail to obtain IDs, sacrificing availability to prevent duplicate states.
 
 ## Q4: A team proposes increasing the sequence bit length in a custom Snowflake setup from 12 bits to 16 bits while shrinking the timestamp allocation. What is the immediate architectural trade-off of this decision?
-
-**Options:**
-
-- The system can support more concurrency per millisecond, but the operational lifespan before the custom epoch wraps around is severely reduced.
-- The ID size expands beyond 64 bits, forcing a shift to 128-bit memory allocation models.
-- The system becomes highly vulnerable to network partitions between the datacenters.
-- The generation algorithm requires dynamic coordination via an external consensus tool like Apache ZooKeeper for every ID generated.
 
 **Answer:** The system can support more concurrency per millisecond, but the operational lifespan before the custom epoch wraps around is severely reduced.
 
 ## Q5: To completely remove the Machine ID synchronization bottleneck during cold-starts in a Snowflake cluster, a developer suggests hashing the server's local private IP address into the 10-bit machine field. What flaw exists in this design?
 
-**Options:**
-
-- Hashing an IP address requires a synchronous DNS lookup loop that increases runtime latency.
-- IP address hashes do not provide sequential time-ordering characteristics.
-- Due to the pigeonhole principle, hashing a standard private IP space into 10 bits (1,024 slots) introduces a risk of hash collisions, causing distinct nodes to generate duplicate IDs.
-- Private IP addresses constantly shift during execution, rendering the timestamp invalid.
-
 **Answer:** Due to the pigeonhole principle, hashing a standard private IP space into 10 bits (1,024 slots) introduces a risk of hash collisions, causing distinct nodes to generate duplicate IDs.
 
 ## Q6: If your distributed Snowflake generation clusters encounter a massive traffic spike that exhausts the allocated 12-bit sequence counter (4,096 IDs) within a single millisecond, what is the standard architectural behavior of the local node?
-
-**Options:**
-
-- The node drops the request and throws an HTTP 429 Too Many Requests status code to the client immediately.
-- The node dynamically borrows bits from the Datacenter or Machine ID segment to temporarily pad the sequence block.
-- The node enters a tight loop or spin-lock, polling the system clock until it advances to the next millisecond, where the sequence counter resets to zero.
-- The node automatically falls back to generating a standard UUIDv4 string for the remainder of that specific millisecond window.
 
 **Answer:** The node enters a tight loop or spin-lock, polling the system clock until it advances to the next millisecond, where the sequence counter resets to zero.
 
 ## Q7: When designing an ID generator for public-facing URLs (such as example.com/orders/<id>), using sequential or predictably patterned IDs like those from Snowflake creates an enumeration vulnerability. Which approach mitigates this security flaw while maintaining efficient database ordering properties?
 
-**Options:**
-
-- Generate a completely random UUIDv4 string for external use and map it to a sequential internal ID using an extra lookup index table.
-- Use a cryptographically secure, reversible Feistel cipher or format-preserving encryption (FPE) to obfuscate the time-sorted internal ID before exposing it externally.
-- Base64 encode the Snowflake ID prior to publishing it in the URL parameter fields.
-- Switch the entire system over to a centralized ticket server that randomizes the increment values between steps.
-
 **Answer:** Use a cryptographically secure, reversible Feistel cipher or format-preserving encryption (FPE) to obfuscate the time-sorted internal ID before exposing it externally.
 
 ## Q8: How does the performance impact of storing random IDs (like UUIDv4) differ when writing to an LSM-Tree based storage engine (e.g., Apache Cassandra) versus a B-Tree based storage engine (e.g., MySQL InnoDB)?
-
-**Options:**
-
-- LSM-Trees suffer significantly more than B-Trees because they must maintain a completely sorted layout on disk at the exact moment a write request is accepted.
-- B-Trees handle random IDs better because they utilize dynamic memory page pointers that eliminate physical write fragmentation.
-- LSM-Trees mitigate the immediate write penalty of random IDs by appending writes to an in-memory MemTable and log, transferring the sorting burden to background compaction cycles.
-- Both storage engines experience identical performance degradation because memory layouts are bound by the hardware cache lines regardless of the architecture.
 
 **Answer:** LSM-Trees mitigate the immediate write penalty of random IDs by appending writes to an in-memory MemTable and log, transferring the sorting burden to background compaction cycles.
 
 ## Q9: To manage Machine ID coordination via ZooKeeper safely, which type of node path should be utilized to represent the live registration of an active ID generation server?
 
-**Options:**
-
-- Persistent Nodes, ensuring that the worker ID allocation remains permanently bound to that instance regardless of machine reboots.
-- Ephemeral Sequential Nodes, allowing ZooKeeper to automatically release the slot if the node disconnects, while utilizing the auto-generated suffix to determine the unique Machine ID number.
-- Container Nodes, which isolate the metadata pathing from the parent data configuration tree.
-- TTL Nodes, relying on a hard time-to-live threshold to periodically flush the registration regardless of live socket connection states.
-
 **Answer:** Ephemeral Sequential Nodes, allowing ZooKeeper to automatically release the slot if the node disconnects, while utilizing the auto-generated suffix to determine the unique Machine ID number.
 
 ## Q10: In cloud environments using infrastructure like AWS EC2 or Google Compute Engine, how does choosing an NTP 'Time Smearing' configuration alter the risk vector of a Snowflake ID generator compared to a standard NTP 'Time Stepping' configuration?
-
-**Options:**
-
-- Time smearing increases the risk of duplicate IDs because it creates unpredictable, massive forward clock jumps.
-- Time smearing eliminates the backward clock drift risk by slowing down or stretching clock ticks uniformly over a long window to correct offsets smoothly without backward steps.
-- Time smearing introduces network partition vulnerability since nodes cannot communicate with the atomic source clock.
-- Time smearing degrades performance by introducing a lock synchronization loop across the internal kernel layer of the OS.
 
 **Answer:** Time smearing eliminates the backward clock drift risk by slowing down or stretching clock ticks uniformly over a long window to correct offsets smoothly without backward steps.
 
@@ -152,3 +82,66 @@
 
 **Answer:** Diagnosis: random UUIDs on a B-Tree indexed primary key cause **index fragmentation**: new UUIDs insert at random leaf positions, causing frequent page splits (~50% of all writes trigger a split at high throughput). The B-Tree becomes "bloated" â€” 40-60% of disk pages contain <50% useful data. More IOPS/SSDs don't fix the fundamental write amplification (each insert touches 3-4 pages due to splits vs 1-2 for monotonic keys). Verify by checking `avg_btree_page_density` (<60%) and `page_splits_per_write` (>0.3). Migration with zero downtime: (1) **dual-write** â€” add a new column `id_monotonic` (BIGSERIAL or UUID v7) to each table alongside the existing UUID. The application writes to both columns. Index on `id_monotonic`. (2) **backfill** â€” a background job backfills `id_monotonic` for existing rows using a Snowflake-like generator. Process in batches of 1000 rows with throttling (10% of cluster IO). (3) **read path migration** â€” first, add a new index on `(id_monotonic)`. Use a feature flag to switch reads from the UUID index to the monotonic index for 1% of queries â†’ validate correctness and latency â†’ ramp to 100%. (4) **application changes** â€” update all JOINs and foreign keys that reference the old UUID. For FKs, add the monotonic ID as a new FK column and dual-write during migration. (5) **drop old index** â€” after 1 month of stability, drop the UUID primary key index (keep the UUID column as a unique constraint for backward compatibility). The principal engineer's insight: the fix is not more hardware â€” it's fixing the data access pattern. The original choice of random UUIDs was architectural debt that eventually shows up as "the database is slow." This is a classic case where understanding the storage engine's internals (B-Tree page split mechanics) is essential for diagnosis.
 
+
+## Q21: How do you handle Snowflake clock skew caused by NTP corrections in production? Design a comprehensive anti-clock-drift strategy beyond simple spin-loops.
+
+**Answer:** **Multi-layer anti-drift strategy**: (1) **NTP configuration** — use 
+tpd -x (slow slew mode) so clock corrections happen gradually over hours, not instant jumps. Never use 
+tpdate or chrony makestep. (2) **hardware timestamp source** — deploy PTP (Precision Time Protocol) NICs in each DC. PTP achieves sub-microsecond accuracy using hardware timestamping in the NIC, decoupling from OS scheduler jitter. (3) **last-generated-timestamp persistence** — write the last timestamp to disk every N IDs (e.g., every 1000 IDs). On crash recovery, read max_ts from disk. If system clock is before max_ts, stall until it catches up. (4) **graceful degradation** — if clock offset > 100ms, log and alert but continue generating (risk of small non-monotonicity). If offset > 1 second, refuse to generate IDs (return 503) — monotonicity is more critical than availability for ordering-dependent applications. (5) **multi-node fencing via ZooKeeper** — on startup, each worker registers with ZooKeeper including its current timestamp. ZooKeeper rejects registration if the timestamp is less than the last registered timestamp for that worker ID — this prevents a node with a stale clock from joining the cluster. (6) **clock skew monitoring** — every worker exposes clock_offset_ms and clock_monotonic_ok metrics. Aggregate into a cluster-wide dashboard. Alert if any node's offset exceeds 50ms for >1 minute.
+
+---
+
+## Q22: Compare UUID v7 (time-ordered UUID) with Snowflake for distributed ID generation. Under what conditions is UUID v7 strictly better?
+
+**Answer:** **UUID v7** (RFC 9562): 48-bit Unix ms timestamp + 74 bits of random data, encoded as a 128-bit UUID. **Snowflake**: 41-bit custom epoch ms + 10-bit worker + 12-bit sequence. UUID v7 advantages: (1) **zero coordination** — no worker ID assignment needed. Any node can generate IDs independently without service discovery. (2) **128-bit space** — essentially zero collision probability. Snowflake's 64-bit space may reach collision risk at exabyte scale. (3) **standard UUID format** — interoperable with existing UUID tooling, database types, and ORMs. Snowflake is custom. (4) **decentralized** — no ZooKeeper or etcd dependency. Better for serverless/FaaS where workers are ephemeral. Conditions where UUID v7 is strictly better: (a) **serverless architectures** — Lambda/Functions that need IDs without external coordination; (b) **offline-first mobile apps** — devices generate IDs locally and sync later; (c) **high-frequency trading event logs** — 128-bit space ensures zero collision; (d) **heterogeneous systems** — multiple microservices using different languages need a standard ID format. Snowflake wins on ID length (64-bit vs 128-bit fits in a BIGINT) and monotonicity guarantees within a worker (UUID v7's timestamp + random means IDs within the same ms are not ordered).
+
+---
+
+## Q23: Compare ULID vs KSUID for distributed ID generation. What are the trade-offs in lexicographic ordering, timestamp precision, and ID length?
+
+**Answer:** **ULID** (26 chars, Crockford Base32): 48-bit ms timestamp + 80-bit random. **KSUID** (27 chars, base62): 32-bit seconds timestamp + 128-bit random payload. Trade-offs: (1) **timestamp precision** — ULID uses milliseconds (48 bits ? enough until 10889 AD). KSUID uses seconds (32 bits ? enough until 2106). ULID is better for high-throughput ordering within the same second. (2) **ordering** — both are lexicographically sortable. ULID sorts by ms then random (within same ms, not monotonic). KSUID sorts by seconds then random (within same second, not monotonic). ULID is better for sub-second ordering. (3) **ID length** — ULID is 26 chars (128 bits), KSUID is 27 chars (160 bits). Negligible difference. (4) **collision probability** — ULID: 80-bit random ? 1.2×10^19 unique IDs per ms. KSUID: 128-bit random ? 3.4×10^38 unique IDs per second. Both are astronomically safe. (5) **use case** — ULID is better for database primary keys (26 chars fits in a VARCHAR(26), B-Tree friendly). KSUID is better when you need more randomness space (e.g., as session tokens where unpredictability matters). ULID wins for most application-level ID generation.
+
+---
+
+## Q24: What is the probability of ID collision at billion-scale for Snowflake (64-bit), UUID v4 (122-bit random), and ULID (80-bit random)? How do you calculate and mitigate collision risk?
+
+**Answer:** Birthday paradox: P ˜ N² / (2 × 2^bits). For N = 1 billion (10^9): (1) **Snowflake (64-bit, but only ~41 bits are unique within an epoch, since worker ID and sequence are deterministic within a node)** — effective random bits are the timestamp + sequence (about 53 bits of temporal uniqueness). P ˜ (10^9)² / (2 × 2^53) ˜ 10^18 / 1.8×10^16 ˜ 5.5% collision probability — non-negligible at billion scale. Mitigation: ensure worker IDs are unique across the cluster and use 12-bit sequence (4096 IDs/ms) — collisions only occur if two workers share the same ID or clock skew causes duplicate timestamps. (2) **UUID v4 (122 random bits)** — P ˜ (10^9)² / (2 × 2^122) ˜ 10^18 / 1.06×10^37 ˜ 9.4×10^-20 — effectively zero. (3) **ULID (80 random bits)** — P ˜ (10^9)² / (2 × 2^80) ˜ 10^18 / 2.4×10^24 ˜ 4.2×10^-7 — extremely low (<1 in a million). Mitigation strategies: (a) **monitor collision rate** — log every duplicate key error in the database. (b) **retry on collision** — if a unique constraint violation occurs, regenerate the ID. For Snowflake-style IDs, increment the sequence or move to the next ms. (c) **increase ID space** — if scaling to trillions, switch to 128-bit ULID or UUID v7. (d) **prefix with worker ID** — always include a guaranteed-unique worker ID in the ID (not just timestamp + random) to guarantee zero collision within the cluster.
+
+---
+
+## Q25: How do you obfuscate sequential or Snowflake IDs for public-facing use to prevent enumeration attacks? Compare hashids, Format-Preserving Encryption (FPE), and database-level random IDs.
+
+**Answer:** Options: (1) **Hashids** — encodes integers into a short, unique-looking string using a configurable alphabet and salt. **Not cryptographically secure** — a determined attacker with enough samples can reverse the encoding (hashids is a reversible encoding, not encryption). **Do not use for security-sensitive applications**. (2) **Format-Preserving Encryption (FPE)** — uses a block cipher (e.g., AES-FF1, FF3-1) to encrypt a numeric ID within the same numeric space. Cryptographically secure (AES-based), reversible (with the key), and preserves ID format. Key management: use a rotation policy (rotate key annually). (3) **Database-level random IDs** — allocate a random 64-bit or 128-bit ID at creation time (instead of sequential) and index it. No encoding needed. But random IDs impact B-Tree index performance (page splits). Comparison: FPE is the goldilocks solution — cryptographically secure, reversible, and allows sequential internal IDs for B-Tree performance. Hashids should only be used for non-security needs (e.g., short YouTube-style video IDs where guessability is not a critical threat). Database random IDs are simpler but degrade write throughput. Production recommendation: use Snowflake internally (for B-Tree efficiency) ? FPE-encrypt with a rotating key ? expose the encrypted ID externally. The FPE key is stored in a vault (HashiCorp Vault) and loaded at application startup.
+
+---
+
+## Q26: Design a distributed sequence generation system that does not rely on a centralized database. How do you guarantee uniqueness without a single point of failure?
+
+**Answer:** **Decentralized sequence with pre-allocated ranges**: (1) each service instance claims a range of IDs from a **distributed coordination service** (etcd, ZooKeeper, or a Raft-based sequencer). Claim format: service:instance_id ? {range_start, range_end}. The coordinator persists the latest allocated ange_end for each instance. (2) on startup, instance X asks the coordinator for a new range: coordinator returns [current_max+1, current_max+range_size] and updates current_max. If the instance crashes and restarts, it gets a new, non-overlapping range. (3) **range size** determines how often the instance must contact the coordinator — larger ranges reduce coordinator load. For 100K IDs/s, a range of 10M IDs lasts 100 seconds — coordinator load is ~1 req/100s per instance, negligible. (4) **SPOF avoidance** — the coordinator is itself a Raft cluster (5 nodes). If the leader dies, a new leader is elected within seconds. The range allocation is idempotent: if the client crashes after receiving a range but before using it, the range is wasted but not reused (gaps are acceptable). (5) **monotonicity** — IDs within an instance are strictly monotonic (in-memory counter). Across instances, IDs are not globally monotonic unless you use a total ordering scheme (e.g., a global sequencer). (6) **alternative** — use **Amazon Aurora / CockroachDB auto-increment** with NO CACHE and RESTART IDENTITY for a fully-managed solution. But "without a centralized DB" means no SQL database either.
+
+---
+
+## Q27: How do you guarantee ID monotonicity when generating time-based IDs across multiple worker processes on the same machine? What happens with multi-threaded race conditions?
+
+**Answer:** **Per-process sequence counter**: within a single process, use an atomic counter (sync/atomic.AddUint64 in Go, AtomicLong in Java) for the sequence within the current timestamp. For multi-threaded access, the atomics are sufficient. For multi-process on the same machine: (1) **file-based lock** — each process acquires a shared file lock (lock) on a PID file. The first process to start picks worker ID 0, the next picks 1, etc. This is coarse-grained (lock held for lifetime of process). (2) **shared memory sequence** — use a shared memory segment (POSIX SHM) to store the current sequence and timestamp. All processes on the same machine share this counter. The sequence is incremented atomically via a 64-bit atomic memory operation on shared memory. This eliminates the 12-bit per-millisecond limit because all processes share the same sequence. (3) **multi-threaded race**: if two threads call 
+extId() at the same nanosecond, the atomic counter ensures they get different sequence numbers. The atomic compare-and-swap loop will retry if the timestamp advances between the read and the CAS update. (4) **hybrid** — use per-thread sequence counters (like Linux's per-CPU counters) to avoid contention entirely. Each thread has its own 64-bit ID space (thread_id | timestamp | thread_sequence). This has zero contention but uses more ID bits for the thread ID.
+
+---
+
+## Q28: Why is ID recycling and reuse dangerous in distributed systems? How do you design an ID allocation policy that prevents reuse even after decommissioning?
+
+**Answer:** ID recycling is dangerous because **delayed data** (cached records, dead-letter queues, log entries) may reference an old ID. If the ID is reused, the reference now points to wrong data. Example: a customer's account ID 12345 is deleted. A year later, a new customer gets ID 12345. An old invoicing system has a cached reference to "invoice for account 12345" — it now sees the new customer's account. Prevention: (1) **ID space expansion** — use a sufficiently large ID space (64-bit or 128-bit) that recycling is never needed. At 1M IDs/sec, 64-bit space lasts 584,000 years. (2) **epoch-based IDs** — Snowflake timestamps include the creation time. Even if two sequences start at the same counter, different timestamps make them unique. (3) **never-reuse policy** — deleted IDs are permanently retired to a **blacklist** (a Bloom filter of decommissioned IDs). On ID allocation, check the blacklist. At billion scale, the Bloom filter is ~125MB (10 bits per ID for 100M decommissioned IDs). (4) **soft-delete with TTL** — IDs are soft-deleted with a TTL equal to the maximum data retention period (e.g., 7 years for financial data). After the TTL, the ID can be reused — but only if all systems that might reference the ID have also purged their data. This is rarely safe. (5) **principal rule**: **never recycle IDs in a distributed system**. The engineering cost of preventing stale references is always higher than the cost of expanding the ID space.
+
+---
+
+## Q29: How do you make Snowflake IDs shorter (e.g., for SMS or customer-support readability) while maintaining uniqueness? What are the compression trade-offs?
+
+**Answer:** Snowflake produces 64-bit integers (~19 decimal digits). For shortening: (1) **Base62 encoding** — encode the 64-bit integer in base62 (0-9, a-z, A-Z). This produces ~11 characters. Example: 221446371492728832 ? 2j9kNXpQ. Trade-off: case-sensitive, may cause confusion (O/0, l/1). (2) **Base58** — same as base62 but omits similar-looking characters (0, O, I, l). Produces ~11 characters. **Best balance** for human readability. (3) **Custom alphabet with check digit** — base32 (Crockford) with an appended check digit (mod 37). Produces ~13 characters with error detection. Used by ULID. (4) **Lossy truncation** — truncate the 64-bit ID to 40 bits (~7 base62 characters). Collision risk: at 1B IDs, truncation causes ~5% collision probability (birthday paradox). **Only acceptable for non-unique contexts** (logging correlation IDs, not primary keys). (5) **Hash + dedup table** — hash the Snowflake ID to N bits and store the mapping in a KV store. This lets you use arbitrarily short IDs (e.g., 6 chars). Trade-off: added per-request DB lookup, storage for the mapping table, and the hash must be checked for collisions. Production reality: for customer-support short IDs, use the full Snowflake ? base58 (11 chars). For SMS short links, use a separate short-ID generator with a dedicated short_id ? snowflake_id lookup table.
+
+---
+
+## Q30: Design a multi-datacenter Snowflake worker ID assignment strategy. How do you ensure unique worker IDs across regions without a centralized ZooKeeper?
+
+**Answer:** **Decentralized worker ID assignment without ZooKeeper**: (1) **static configuration per DC** — allocate a fixed DC ID (2 bits: 1-4), and within each DC, allocate worker IDs from a non-overlapping range. For example, DC1: 0-255, DC2: 256-511, DC3: 512-767, DC4: 768-1023 (8-bit worker ID). Each DC's configuration management system (e.g., AWS AppConfig, Kubernetes ConfigMap) assigns a unique index within the DC's range to each worker. This requires no runtime coordination — IDs are determined at deployment time. (2) **IP-based hashing with collision resolution** — each worker computes worker_id = hash(private_ip) mod 1024. Collision probability for N workers is P = 1 - (1024!/((1024-N)! × 1024^N)). For 500 workers, P ˜ 11%. Mitigation: on collision (detected by logging a worker_id_conflict metric), the worker retries with a different hash (e.g., hash(ip + port)). This is eventually consistent — collisions are detected at startup, not at ID generation time. (3) **etcd-based allocation per DC** — each DC runs its own etcd cluster (5 nodes). Workers register by creating a lease-based key workers/{region}/{worker_id} with a TTL of 30 seconds. If the worker dies, the lease expires and the ID is freed. This eliminates cross-DC coordination (etcd is per-DC) but adds a 10ms registration latency at startup. (4) **hybrid** — static DC allocation + per-DC etcd allocation. DC IDs are from the config (2 bits). Worker IDs within a DC are from etcd (9 bits, 0-511). Total 11 bits (2048 workers per DC, 16 DCs). This is the approach used by Uber's distributed ID generator. (5) **monitoring** — expose worker_id, dc_id, and worker_id_source (static/ip-hash/etcd) as metrics. Alert if any two workers in the same DC report the same worker_id — this indicates a configuration error that will cause ID collisions.
+
+---

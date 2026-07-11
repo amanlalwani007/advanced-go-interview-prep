@@ -2,111 +2,41 @@
 
 ## Q1: When designing a write-heavy, highly scalable distributed key-value store, why is an LSM-Tree (Log-Structured Merge-Tree) based storage engine commonly preferred over a B+Tree?
 
-**Options:**
-
-- LSM-Trees eliminate the need for an append-only write-ahead log file.
-- LSM-Trees convert random writes into fast sequential appends by buffering updates in an in-memory MemTable and logging them, deferring sorting to background compaction cycles.
-- LSM-Trees eliminate storage space compaction overhead entirely.
-- LSM-Trees perform fast, multi-table synchronous joins on the critical read path.
-
 **Answer:** LSM-Trees convert random writes into fast sequential appends by buffering updates in an in-memory MemTable and logging them, deferring sorting to background compaction cycles.
 
 ## Q2: According to the CAP theorem, if a multi-datacenter key-value store encounters a network partition, what architectural trade-off is forced upon the system design?
-
-**Options:**
-
-- You must choose between Consistency (CP) by rejecting writes to isolated partitions to prevent split-brains, or Availability (AP) by accepting local writes that cause divergent data states.
-- The system can preserve both parameters by moving to a single-node monolithic state.
-- The partition tolerance parameter can be disabled dynamically via configuration flags.
-- The system must transition all active columns into binary arrays to protect consistency.
 
 **Answer:** You must choose between Consistency (CP) by rejecting writes to isolated partitions to prevent split-brains, or Availability (AP) by accepting local writes that cause divergent data states.
 
 ## Q3: How does a distributed key-value store use Vector Clocks to identify data conflicts across multiple replica nodes without a central locking coordinator?
 
-**Options:**
-
-- Vector clocks compare physical system clock times using NTP time stepping rules.
-- Each replica node maintains an array of logical clock counters `[node_id: counter]`. By tracking and passing these arrays with updates, the system can systematically deduce if an update causally follows, precedes, or conflicts with another.
-- Vector clocks automatically overwrite older updates using a strict first-in, first-out memory queue.
-- They force all storage node files to wipe out secondary index metadata parameters.
-
 **Answer:** Each replica node maintains an array of logical clock counters `[node_id: counter]`. By tracking and passing these arrays with updates, the system can systematically deduce if an update causally follows, precedes, or conflicts with another.
 
 ## Q4: When configuring a distributed key-value store cluster with a replication factor of $N=3$, which quorum configuration guarantees strict read consistency (Strong Consistency)?
-
-**Options:**
-
-- Setting write quorum $W=1$ and read quorum $R=1$ to optimize connection throughput lanes.
-- Ensuring the quorum equation satisfies $W + R > N$ (e.g., $W=2, R=2$), meaning the read and write replica sets will always overlap at least one up-to-date node.
-- Moving all replication handling metrics to run over local loopback interfaces exclusively.
-- Dropping write quorum variables entirely and relying on client apps to manage version states.
 
 **Answer:** Ensuring the quorum equation satisfies $W + R > N$ (e.g., $W=2, R=2$), meaning the read and write replica sets will always overlap at least one up-to-date node.
 
 ## Q5: What performance optimization does a Bloom Filter provide inside the read path of an LSM-Tree based key-value storage engine?
 
-**Options:**
-
-- It compresses cleartext content strings into binary byte representations on disk.
-- It acts as a fast, probabilistic in-memory check that can instantly verify if a key does *not* exist in an SSTable, preventing expensive, redundant disk lookups for missing keys.
-- It automatically indexes unindexed tables across distributed storage shards.
-- It forces client browsers to execute exponential backoff loops during connection drops.
-
 **Answer:** It acts as a fast, probabilistic in-memory check that can instantly verify if a key does *not* exist in an SSTable, preventing expensive, redundant disk lookups for missing keys.
 
 ## Q6: In a distributed NoSQL key-value store, what role does the 'Gossip Protocol' play among cluster nodes?
-
-**Options:**
-
-- It manages the two-phase commit locks for transactional table schema migrations.
-- It provides a decentralized, peer-to-peer communication model where nodes periodically exchange status information to maintain a shared view of cluster membership and node health.
-- It routes real-time telemetry events out to global edge CDN caching networks.
-- It forces client application containers to clear out local caching buffers hourly.
 
 **Answer:** It provides a decentralized, peer-to-peer communication model where nodes periodically exchange status information to maintain a shared view of cluster membership and node health.
 
 ## Q7: To resolve data divergence between replica nodes asynchronously during low-traffic windows, what background repair mechanism is used in key-value clusters like DynamoDB or Cassandra?
 
-**Options:**
-
-- Re-executing full disk formatting sequences across all storage cluster machines sequentially.
-- Using Merkle Trees (cryptographic tree hashes) to compare data blocks between replicas efficiently, identifying and syncing only the divergent data rows over the network.
-- Converting the keyspace array to use random string configurations across regional datacenters.
-- Dropping secondary index tracking configurations to reclaim storage spaces.
-
 **Answer:** Using Merkle Trees (cryptographic tree hashes) to compare data blocks between replicas efficiently, identifying and syncing only the divergent data rows over the network.
 
 ## Q8: What is the primary operational trade-off of configuring an LSM-Tree storage engine to use 'Size-Tiered Compaction' versus 'Leveled Compaction'?
-
-**Options:**
-
-- Size-tiered compaction eliminates the need to track keyspaces using a write-ahead log.
-- Size-tiered compaction optimizes for fast write paths with minimal overhead, but causes high space amplification; leveled compaction reduces space amplification and speeds up reads but incurs a heavy write amplification penalty.
-- Leveled compaction mandates the deployment of single-leader replication models exclusively.
-- Size-tiered compaction automatically encrypts payload attributes inside disk block boundaries.
 
 **Answer:** Size-tiered compaction optimizes for fast write paths with minimal overhead, but causes high space amplification; leveled compaction reduces space amplification and speeds up reads but incurs a heavy write amplification penalty.
 
 ## Q9: When a key-value store encounters a write request while a primary storage replica node is temporarily offline, how does a 'Hinted Handoff' strategy maintain availability?
 
-**Options:**
-
-- The system drops the write event entirely and alerts the edge load balancer gateway tier.
-- An alternate healthy node accepts the write and stores a temporary 'hint' record locally, asynchronously delivering the update payload once the primary replica recovers.
-- The system blocks all inbound system operations until the dropped server finishes a reboot.
-- The data formatting tier converts the record into flat text log directories locally.
-
 **Answer:** An alternate healthy node accepts the write and stores a temporary 'hint' record locally, asynchronously delivering the update payload once the primary replica recovers.
 
 ## Q10: What is the architectural purpose of a Write-Ahead Log (WAL) inside a stateful database or key-value store node?
-
-**Options:**
-
-- To provide an indexing structure that accelerates read path wildcard lookups.
-- To provide durability by appending incoming transactions sequentially to non-volatile disk before updating in-memory datastores, ensuring data recovery if the node crashes.
-- To encrypt database transaction log data arrays before crossing data center networks.
-- To throttle incoming client connection queries at the ingress gateway boundary.
 
 **Answer:** To provide durability by appending incoming transactions sequentially to non-volatile disk before updating in-memory datastores, ensuring data recovery if the node crashes.
 
@@ -152,3 +82,64 @@
 
 **Answer:** **Trickle migration with double-write + shadow-read**: (1) **Phase 0: Shadow-write** â€” deploy a proxy in front of the legacy store that writes every mutation to BOTH systems (legacy + new). The proxy does not wait for the new store's ack â€” it fires and forgets. This warms the new store without affecting write latency. (2) **Phase 1: Backfill** â€” a MapReduce job reads all 10PB from the legacy store in parallel (1000 workers, each reading 10GB batches). For each item, it writes to the new store with a flag `migration_source: "backfill"`. The shadow-writer writes with `migration_source: "live"`. The new store uses LWW CRDTs: the `live` timestamp always wins over `backfill` (since `live` is chronologically newer). (3) **Phase 2: Shadow-read validation** â€” the proxy routes 1% of read traffic to both stores and compares results. Differences are logged and fixed via a repair worker (reads from legacy, overwrites new). Run until 0 divergence for 24 hours. (4) **Phase 3: Cutover** â€” route 100% of reads to the new store, but keep the legacy store live and dual-writing for 1 week. (5) **Phase 4: Tear-down** â€” stop dual-writes; keep legacy as read-only backup for another month. Validation at cutover: run a **checksum reconciliation** â€” for every partition, compute a Merkle tree checksum over all key-value pairs in both stores (background job, throttled to 10% of cluster IO). The Merkle trees must match within 0.001% divergence (allowing for in-flight mutations). If not, roll back by flipping the read path to legacy. The rollback plan: the proxy has a feature flag `use_new_store`. If p99 latency on the new store exceeds the legacy by >20% for 5 minutes, auto-rollback.
 
+
+## Q21: Compare Leveled Compaction vs Size-Tiered Compaction in LSM-Trees under real-world workloads. When would you choose one over the other and how do you tune them?
+
+**Answer:** **Leveled Compaction** (used in LevelDB/RocksDB): data is organized into levels (L0, L1, ..., Ln). Each level has a size multiplier (e.g., 10×). Compaction merges a sorted run from level N with overlapping runs in level N+1, producing new sorted runs in N+1. **Size-Tiered Compaction** (used in Cassandra): multiple sorted runs of similar size are merged into a single larger run. Trade-offs: Leveled has lower space amplification (1.1× vs 3×+ for Size-Tiered) and better read performance (fewer overlapping SSTables per level), but higher write amplification (10-30× vs 1-3×). Size-Tiered favors write-heavy workloads with rare reads. Tuning: Leveled — control level_size_multiplier (default 10, reduce to 5 for less write amp, increase to 20 for less read amp). Size-Tiered — control min_sstable_size and ucket_high/low thresholds. Real-world: Cassandra uses Size-Tiered by default; switch to Leveled when point-read latency increases or disk space is constrained. RocksDB defaults to Leveled but offers a Tiered compaction option (kCompactionStyleUniversal) for write-heavy ingest pipelines.
+
+---
+
+## Q22: How do you tune Bloom filter false positive rate in a production KV store? What is the cost-benefit analysis of reducing the FPR from 1% to 0.1%?
+
+**Answer:** Bloom filter FPR is determined by its_per_key. Rule of thumb: k = (m/n) * ln(2) where m = bits, 
+ = keys, k = hash functions. At 10 bits/key ? ~1% FPR. At 14 bits/key ? ~0.1% FPR. Cost-benefit: reducing FPR from 1% to 0.1% increases memory by 40% (10 ? 14 bits/key). For a 1TB database with 1B keys, that's 10GB ? 14GB extra memory. Benefit: 10× fewer false-positive disk reads. For point-read-heavy workloads (90%+ reads), the latency savings justify the memory. For write-heavy workloads with sparse reads, the extra memory is wasted. Production tuning: monitor loom_filter_useful metric (how many times the filter prevented a disk read). If >99% of lookups are filtered, consider reducing bits/key. If <90%, increase bits/key. For range queries, Bloom filters provide no benefit — consider a **prefix Bloom filter** or **suffix Bloom filter** for range-scan-heavy workloads.
+
+---
+
+## Q23: How does Hinted Handoff differ from Read Repair in maintaining eventual consistency? Under what conditions does each mechanism fail to resolve conflicts?
+
+**Answer:** **Hinted Handoff**: when a replica is unavailable, a coordinator node stores a "hint" (the write) locally and forwards it when the replica recovers. This ensures the write is eventually applied. **Read Repair**: on a read, the coordinator fetches data from all replicas, compares digests, and if a replica is stale, pushes the latest value to it synchronously. Differences: Hinted Handoff is write-path repair, Read Repair is read-path repair. Hinted Handoff uses bounded storage (hints have a TTL, default 3 hours in Cassandra). Read Repair has no storage cost but adds read latency (must contact all replicas). Failure modes: Hinted Handoff fails if the coordinator crashes before delivering hints (hints are stored locally, not replicated). Read Repair fails if all replicas are stale (no authoritative version exists) — requires anti-entropy repair. In practice, both are used together: Hinted Handoff for short outages (<3h), Read Repair for continuous healing, and Merkle tree anti-entropy for deep repair during hinted handoff expiration windows.
+
+---
+
+## Q24: Design the quorum consistency configuration for a globally distributed KV store that spans 3 regions with 3 replicas each (RF=3 per region, 9 total replicas). How do you choose W and R to balance local read performance with global consistency?
+
+**Answer:** Options: (1) **Local quorum** — read and write from replicas in the same region only. W_local=2, R_local=2 ? W+R > RF but only within a region. This gives fast local reads/writes (intra-region latency ~1ms) but eventual consistency across regions (writes are replicated asynchronously). (2) **Global quorum** — W=5, R=5 across all 9 replicas (any region). Guarantees strong consistency globally but write latency is bounded by the slowest region (inter-region ~100ms+). (3) **Hybrid** — use **Consistency Level LOCAL_QUORUM** by default. For critical data (account balance), use **EACH_QUORUM** (W=2 in every region, so W_total=6) — ensures two replicas in each region have the data before acknowledging. Reads use LOCAL_QUORUM. This guarantees that a subsequent LOCAL_QUORUM read in any region will find at least one up-to-date replica (since each region has 2 copies). Trade-off: EACH_QUORUM writes are as slow as the slowest region. Tuning: use a **consistency-level-per-operation** API. Monitoring: track write_latency and ead_stale_count (number of stale reads served). If stale reads >0.01%, the consistency level is too weak for the workload.
+
+---
+
+## Q25: Design an anti-entropy repair system using Merkle trees for a KV store with 10PB of data across 100 nodes. How do you minimize the repair window and network overhead?
+
+**Answer:** **Hierarchical Merkle tree**: each node builds a Merkle tree of its local data, partitioned into 256 ranges. Each tree level aggregates hashes of sub-ranges. To compare two replicas, exchange root hashes ? recursively descend only on mismatched sub-trees. For 10PB/100 nodes: ~100TB per node. Build time for Merkle tree: parallel scan of SSTables, computing hashes incrementally — ~2 hours per node (10TB at 1.5GB/s scan). Optimizations: (1) **incremental Merkle tree** — persist the tree across repairs; on the next repair, only recompute the branches whose underlying data has changed (tracked by a version counter per partition range). This reduces rebuild time to ~minutes. (2) **sub-range validation sampling** — instead of validating all 256 sub-ranges, randomly sample N sub-ranges (e.g., N=10). If all match, assume full tree matches with high probability (probabilistic repair). If any mismatch, fall back to full tree comparison. (3) **parallel repair** — divide the 100 nodes into 10 repair groups (10 nodes each). Within a group, all nodes repair simultaneously with their peers (full mesh). Network overhead: each sub-range hash is 32 bytes (SHA-256). 256 sub-ranges ? 8KB per node pair exchange. Full repair of all 100 nodes: ~100 * 99 / 2 * 8KB = ~40MB of hash exchange — negligible. The bulk is the data transfer for mismatched ranges. Rate-limit repair to 10% of cluster bandwidth (e.g., 1Gbps per node) to avoid impacting production traffic.
+
+---
+
+## Q26: How do you implement garbage collection of tombstones in an LSM-Tree based KV store? What happens if tombstones are not cleaned up promptly?
+
+**Answer:** Tombstones are markers indicating a key was deleted. In LSM-Trees, the actual deletion happens during compaction: when a tombstone and the corresponding data key are in the same compaction run, the key-value pair is dropped. Garbage collection strategy: (1) **compaction GC** — during compaction, if a tombstone's timestamp is older than gc_grace_seconds (default 10 days in Cassandra) and all SSTables containing the deleted key are being compacted together, the tombstone and the deleted data are both dropped. (2) **range tombstone compaction** — for range deletions, use a specialized compaction that drops entire SSTable ranges. (3) **tombstone ratio monitoring** — track sstable_tombstone_ratio. If >50% of entries in an SSTable are tombstones, schedule immediate compaction of that SSTable. Consequences of not cleaning up tombstones: (a) **read amplification** — tombstones must be checked on every read to determine if a key is deleted. They consume CPU and I/O. (b) **space amplification** — tombstones consume disk space. (c) **bloom filter inefficiency** — Bloom filters cannot filter tombstones, so reads for deleted keys always cause a disk lookup. (d) **write amplification** — tombstones must be rewritten during compaction until they are GC'd. Production alert: max_tombstone_count per query — if >100K tombstones are encountered in a single read, reject the query (it would cause O(n) latency).
+
+---
+
+## Q27: Design a multi-region replication strategy for a KV store where writes in region A must be visible in region B within 100ms. How do you handle conflicts and latency?
+
+**Answer:** **Dual-region synchronous replication with conflict resolution**: deploy clusters in 3 regions. Each write goes to the local region + one remote region synchronously (a "witness" write). Example: client in us-east-1 writes to us-east-1 and us-west-1 synchronously (await both acks). The third region (eu-west-1) receives data asynchronously. This gives strong consistency between the two synchronous regions (if one fails, the other has the data). Conflict resolution: use **last-writer-wins (LWW)** with wall-clock timestamps or **hybrid logical clocks (HLC)** to resolve concurrent writes. Timestamps must be accurate across regions: deploy NTP with PTP hardware in each DC; accept bounded clock skew (e.g., ±5ms). For 100ms SLA: intra-region write: ~1ms, inter-region synchronous write: ~50ms (NY to SF fiber). Total: ~51ms — well within 100ms. (The asynchronous region lags by ~100-500ms). If inter-region latency exceeds the SLA (e.g., transatlantic fiber cut), fall back to LOCAL_QUORUM temporarily — the system becomes eventually consistent across the cut region until connectivity is restored. Monitoring: inter_region_replication_lag. Alert if >200ms. Use **latency-based leader election**: if the primary region's latency to the synchronous peer exceeds 200ms, promote another region as the synchronous peer.
+
+---
+
+## Q28: How do you resolve concurrent writes to the same key from different clients using Vector Clocks? Walk through the algorithm and its limitations.
+
+**Answer:** Vector Clock (VC) algorithm: each replica maintains [replica_id: counter]. On write: replica increments its own counter. The VC is stored with the value. On read: the coordinator returns all values with their VCs. The client merges them if needed. On write: the client includes its last-seen VC. The server compares the incoming VC with the current VC: (1) if incoming VC > current VC (all counters >= and at least one >) ? current value is causally before the write — accept new value. (2) if incoming VC < current VC ? stale write — reject. (3) if concurrent (neither dominates) ? conflict — store both values with a merged VC (element-wise max). Limitations: (1) **clock growth** — VC size grows with the number of replicas. For 1000 nodes, a VC is 1000 entries ? 8KB per value. Mitigation: use **dot-based VCs** (only track replicas that have touched the key) or **truncation** (periodically prune old entries). (2) **conflict explosion** — if many clients write concurrently to the same key, the number of conflicting siblings grows unboundedly. Mitigation: use **last-writer-wins (LWW)** with a wall-clock timestamp as a tiebreaker — siblings above a threshold (e.g., 100) are resolved by timestamp. (3) **no causal consistency across keys** — VCs track per-key causality. For cross-key causality, use **causal contexts** (vector clocks across all keys) which are impractical at scale. (4) **deleted key ambiguity** — after a delete, the VC is reset. A subsequent write from a stale client may appear concurrent when it should be rejected. Use **tombstone VCs** — retain the VC of deleted keys for gc_grace_seconds.
+
+---
+
+## Q29: How do you prevent compaction stalls in an LSM-Tree when the write rate exceeds compaction throughput? Design a backpressure mechanism.
+
+**Answer:** Compaction stalls occur when L0 files accumulate faster than they can be compacted into L1. The read path degrades (more files to check). **Backpressure mechanism**: (1) **soft limit** — when L0_file_count > soft_limit (e.g., 12 in RocksDB), slow down write rate proportionally: write_rate *= (1 - (L0_count - soft_limit) / (hard_limit - soft_limit)). (2) **hard limit** — when L0_file_count > hard_limit (e.g., 20), stop accepting writes (return ServiceUnavailable). This is called **write stall**. (3) **dynamic memtable count** — increase the number of concurrent memtables during high write load (trading memory for compaction headroom). As memtables fill, they become immutable and are L0 files — this gives the compaction thread more work but increases L0 count temporarily. (4) **priority compaction** — when near the stall threshold, trigger compaction with higher urgency: reduce the size ratio for triggering compaction from 1.5× to 1.1×, causing more aggressive compaction for less gain. (5) **predictive pre-compaction** — monitor write_rate with a short-term forecast (EWMA). If predicted write rate exceeds compaction capacity by 20%, pre-trigger compaction of the largest L1 SSTables to free up compaction capacity. (6) **isolation** — separate write memtables from the compaction queue using a **write stall protection pool**: reserve 20% of compaction threads for "emergency" compaction (triggered only when approaching the hard limit). This ensures that at least some compaction progress happens even under load. Monitoring: compaction_pending_bytes and stall_microseconds. Alert on any stall event — it indicates that write capacity is nearing compaction capacity and needs scaling (add nodes or reduce write rate).
+
+---
+
+## Q30: Design a bulk loading strategy for ingesting 100TB of historical data into an LSM-Tree based KV store with minimal impact on live traffic.
+
+**Answer:** **Bulk loading bypasses the normal write path** (which goes through MemTable ? L0 ? compaction). Instead, ingest SSTables directly at the base level (Lmax). Strategy: (1) **prepare sorted input** — sort the import data by key on a separate Spark/Hadoop cluster, producing already-sorted SSTables. For 100TB, use 2000 workers (each processing 50GB) to sort in parallel. (2) **ingest at Lmax** — RocksDB provides IngestExternalFile() which directly adds external SSTables to the LSM tree at the last level (Lmax, typically L6). This avoids write-amplification from compaction (the data is already sorted and non-overlapping). (3) **throttled ingestion** — instead of ingesting 100TB at once (which would cause a compaction storm), throttle to N GB per hour. Set N based on available compaction capacity. For example, if the cluster handles 2TB/day of live writes, allocate 50% of compaction capacity for bulk load — ~1TB/day ? 100TB takes 100 days. (4) **global sequence number** — assign a global sequence number to the bulk-loaded data so it participates correctly in snapshot reads (without this, bulk data may be invisible to existing readers). RocksDB handles this via IngestExternalFileOptions.move_files and ssign_external_file_global_seq_no. (5) **verify after ingestion** — run a checksum scan: read all keys from the ingested SSTables and compare hash values against the source data. (6) **post-ingestion compaction** — after bulk load, if files at Lmax overlap, schedule a manual compaction to reorganize them. Do this at low traffic (weekend). (7) **rollback** — if ingestion fails midway, the ingested SSTables can be removed atomically (delete files and rebuild MANIFEST). No data loss because the original data is still in the source.
+
+---

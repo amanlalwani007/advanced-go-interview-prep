@@ -2,111 +2,41 @@
 
 ## Q1: When configuring an Adaptive Bitrate (ABR) streaming ladder, what is the primary benefit of encoding video files into advanced modern codecs like AV1 or VP9 instead of relying solely on H.264?
 
-**Options:**
-
-- Advanced codecs completely bypass the need for an index manifest file like .m3u8 or .mpd.
-- AV1 and VP9 offer significantly higher compression efficiency, delivering identical or superior visual quality at up to 30-50% lower bitrates, drastically reducing global CDN bandwidth costs.
-- H.264 is incapable of being parsed by modern edge proxy servers or CDNs.
-- Advanced codecs modify transport layers to utilize raw UDP broadcast frames for web browsers.
-
 **Answer:** AV1 and VP9 offer significantly higher compression efficiency, delivering identical or superior visual quality at up to 30-50% lower bitrates, drastically reducing global CDN bandwidth costs.
 
 ## Q2: At YouTube scale, what core storage problem occurs if your architecture retains every resolution and codec variant of an unpopular, long-tail video on high-speed NVMe storage tiers permanently?
-
-**Options:**
-
-- Memory caches lose the ability to compute basic string hash masks.
-- It introduces unsustainable hardware infrastructure and power costs on dormant data profiles, requiring an automated storage lifecycle engine to offload low-traffic videos to cheaper storage tiers.
-- Relational table structures change their indexing types to use binary arrays dynamically.
-- It causes edge load balancers to drop network connection channels if request volumes drop.
 
 **Answer:** It introduces unsustainable hardware infrastructure and power costs on dormant data profiles, requiring an automated storage lifecycle engine to offload low-traffic videos to cheaper storage tiers.
 
 ## Q3: How does a video player app utilizing HLS or DASH manage dynamic resolution transitions smoothly when a user enters a region with poor cellular network connectivity?
 
-**Options:**
-
-- The player terminates the active TCP connection and requests a new session certificate from the edge gateway.
-- The player monitors buffer fill states and network download velocity, reading the manifest index to fetch the next consecutive video chunk from a lower-bitrate directory stream seamlessly.
-- The player client uses an internal parity mechanism to reconstruct missing pixels locally.
-- The video server forces a hard reset of the local device cache parameters.
-
 **Answer:** The player monitors buffer fill states and network download velocity, reading the manifest index to fetch the next consecutive video chunk from a lower-bitrate directory stream seamlessly.
 
 ## Q4: When a highly popular video goes viral globally, how do enterprise platforms like YouTube or Netflix leverage Edge Computing appliances (e.g., Netflix Open Connect) to protect their core origin servers?
-
-**Options:**
-
-- By executing automatic distributed transactions across all international databases synchronously.
-- By deploying customized hardware cache appliances directly inside partner Internet Service Provider (ISP) networks globally, serving hot video traffic locally and avoiding primary network backbone congestion.
-- By translating plain text logs into encrypted bit arrays on the edge proxy nodes.
-- By converting all video streams to rely exclusively on local loopback interface protocols.
 
 **Answer:** By deploying customized hardware cache appliances directly inside partner Internet Service Provider (ISP) networks globally, serving hot video traffic locally and avoiding primary network backbone congestion.
 
 ## Q5: When designing the database schema to track 'User Video Progress' (e.g., remembering where a user stopped watching a 2-hour movie), how do you prevent write loops from overwhelming the system?
 
-**Options:**
-
-- Write a fresh row transaction to the primary relational table for every individual second of playback time.
-- Throttling client updates using a debounced timer (e.g., saving progress every 5-10 seconds) or batching checkpoint watermarks in memory before flushing updates asynchronously to a high-performance NoSQL store.
-- Force the video player to reset its complete memory buffer whenever a timestamp updates.
-- Convert all time tracking fields to run over unindexed flat text files across a shared network mount.
-
 **Answer:** Throttling client updates using a debounced timer (e.g., saving progress every 5-10 seconds) or batching checkpoint watermarks in memory before flushing updates asynchronously to a high-performance NoSQL store.
 
 ## Q6: When designing the video upload ingestion pipeline, why is it critical to split raw files into small chunks at the entry point rather than transcoding the file as a single monolithic block?
-
-**Options:**
-
-- Monolithic transcoding completely removes the capability to use standard TLS encryption over transport layers.
-- Chunking allows the processing task to be distributed across a massive parallel worker fleet using a Directed Acyclic Graph (DAG), reducing overall encoding time from hours down to minutes while isolating failure boundaries.
-- Relational database primary keys are unable to index any file objects larger than 50 megabytes.
-- Monolithic video assets automatically force edge load balancers to drop multi-region failover configurations.
 
 **Answer:** Chunking allows the processing task to be distributed across a massive parallel worker fleet using a Directed Acyclic Graph (DAG), reducing overall encoding time from hours down to minutes while isolating failure boundaries.
 
 ## Q7: What is the primary trade-off when using a very short chunk duration (e.g., 1 second) versus a longer chunk duration (e.g., 10 seconds) inside an HLS streaming configuration?
 
-**Options:**
-
-- Short chunks require fewer index entries inside the manifest file metadata lines.
-- Short chunks reduce initial startup latency and enable fast adaptation to fluctuating networks, but heavily increase manifest parsing overhead and request counts on CDN infrastructure.
-- Longer chunks automatically convert downstream transport layers into UDP streams.
-- Short chunks force downstream databases to execute complete table vacuums hourly.
-
 **Answer:** Short chunks reduce initial startup latency and enable fast adaptation to fluctuating networks, but heavily increase manifest parsing overhead and request counts on CDN infrastructure.
 
 ## Q8: When generating a real-time 'Video View Count' metric for a video receiving 100,000 views per second globally, what architecture balances real-time accuracy with primary database safety?
-
-**Options:**
-
-- Execute a synchronous SQL UPDATE statement with an increment lock for every single view event.
-- Stream view events asynchronously into an engine like Apache Kafka, use a stream processor (e.g., Flink) to aggregate counts over rolling windows, and batch update a high-speed memory cache (Redis) before periodically flushing to persistent disks.
-- Force all client players to block stream rendering until a cross-datacenter disk lock confirms the view score.
-- Save the data directly into local log files on the edge load balancer instances.
 
 **Answer:** Stream view events asynchronously into an engine like Apache Kafka, use a stream processor (e.g., Flink) to aggregate counts over rolling windows, and batch update a high-speed memory cache (Redis) before periodically flushing to persistent disks.
 
 ## Q9: When storing video metadata (title, description, tags, comment metrics), how do you partition the database shards to support fast channel page rendering without scatter-gather overhead?
 
-**Options:**
-
-- Shard the metadata table based on the precise character byte length of the video title field.
-- Shard the metadata tables using the 'channel_id' as the sharding key, ensuring all videos uploaded by the same creator map onto the same physical database node.
-- Force all global data center infrastructure to use a single unpartitioned relational table.
-- Convert all text query fields into flat, unindexed binary rows inside cold storage tape systems.
-
 **Answer:** Shard the metadata tables using the 'channel_id' as the sharding key, ensuring all videos uploaded by the same creator map onto the same physical database node.
 
 ## Q10: If an automated copyright detection service (e.g., Content ID) must evaluate uploaded videos for violations, how do you integrate this check into the system without blocking the initial media ingest pipeline?
-
-**Options:**
-
-- Force the user's browser connection to stay open synchronously while a full matching scan executes across all system history.
-- Extract acoustic and visual fingerprints from video chunks asynchronously via a decoupled message queue event pipeline, evaluating matches against a reference database out-of-band.
-- Force the client player to run the complete match logic locally inside browser memory scripts.
-- Drop the video upload immediately if its filename string parameters match any historical record entries.
 
 **Answer:** Extract acoustic and visual fingerprints from video chunks asynchronously via a decoupled message queue event pipeline, evaluating matches against a reference database out-of-band.
 
@@ -151,4 +81,65 @@
 ## Q20: You need to reduce YouTube's CDN bandwidth costs by 30% without degrading user experience (no longer buffering times, no resolution drops). Design a multi-pronged strategy covering encoding, delivery, and client-side optimizations.
 
 **Answer:** **Bandwidth reduction strategy**: (1) **per-title encoding optimization** — instead of encoding every video with the same ABR ladder, use a **per-title optimized ladder**: for a static vlog (low motion), peak bitrate can be 30% lower than for an action movie at the same perceptual quality. Reduce bitrate for low-motion content until VMAF drops below 93. Average bitrate reduction: 20%. (2) **chunk-level bitrate selection** — within a single video, different chunks have different complexity (a talking head chunk vs. an explosion chunk). Encode each chunk at the optimal bitrate for its complexity, not a uniform bitrate for the whole video. This saves 15% on average. (3) **CDN offload with P2P** — for popular live events, deploy a **WebRTC-based P2P CDN**: viewers fetch segments from peers who have already downloaded them, reducing CDN egress. Browser-based P2P (WebTorrent) can offload 30% of traffic for high-viewer-count videos. (4) **client-side optimizations** — (a) **predictive prefetching**: the client's player predicts which bitrate the user is likely to need next based on bandwidth history and pre-fetches during idle network time, reducing rebuffering without increasing peak bitrate. (b) **stall-free ABR**: the ABR algorithm selects the highest bitrate that can be sustained without stalls, not the highest bitrate possible. This prevents the "two steps forward, one step back" pattern that wastes bandwidth. (5) **image/CDN for thumbnails** — serve video thumbnails via a separate image CDN with WebP/AVIF compression. Thumbnails account for ~5% of total bandwidth; WebP reduces this by 30%. (6) **cost projection** — per-title: -20%, chunk-level: -15%, P2P offload: -30% (on 20% of traffic) = -6% overall, client optimizations: -5% wasted bandwidth. Combined: ~35% reduction. Well above the 30% target. (7) **monitoring** — track `bytes_served_per_view` and `rebuffer_rate`. Ensure rebuffer rate does not increase by more than 0.1% after deploying these optimizations. If it does, roll back the most aggressive encoding changes.
+
+
+## Q21: Design a CDN selection system that routes user video requests to the optimal edge node based on latency, capacity, and cost. How do you handle a regional CDN outage?
+
+**Answer:** **Latency-based CDN routing with health awareness**: (1) **measurement** — each edge CDN node reports its latency to the user via RTT measurements (TCP handshake RTT or DNS query latency). A global latency map is maintained: `user_region → [ {cdn_node: "ewr1", latency_ms: 12, available_capacity_gbps: 200}, ... ]`. (2) **selection algorithm**: for each video request: (a) filter to CDN nodes that have the video cached (or can fetch it within budget). (b) score each candidate: `score = w1 × latency_weight + w2 × capacity_weight + w3 × cost_weight`. (c) select the node with the lowest score. (3) **capacity awareness** — if a CDN node is at 90% capacity, its latency weight is multiplied by 10 (discourages selection). If at 100%, it is removed from the candidate set (despite low latency). (4) **cost optimization** — CDN providers have different pricing: some are cheaper in Europe, others in Asia. The cost weight reflects per-GB pricing per region. For non-premium users, cost weight is higher. For premium users, cost weight is lower (prioritize quality over cost). (5) **regional outage handling**: (a) a health checker probes each CDN node every 10 seconds. If a node fails 3 consecutive probes, it is removed from the routing table. (b) traffic is immediately rerouted to the next best node. (c) if an entire region's CDN nodes are failing (e.g., us-east-1), traffic is rerouted to a different region (e.g., us-west-1 or eu-west-1). Cross-region latency increases (50-200ms) but video playback continues. (d) DNS TTL is set to 30 seconds — clients pick up the new routing quickly. (6) **monitoring**: `cdn_selection_latency_p50` (time to select a CDN node — target <5ms), `cdn_cross_region_reroute_count` (how often requests leave their local region — target <1%).
+
+---
+
+## Q22: Compare adaptive bitrate (ABR) algorithms: throughput-based (buffer occupancy), model-based (MPEG-DASH SAND), and hybrid. When is each appropriate for YouTube-scale streaming?
+
+**Answer:** (1) **Throughput-based ABR** (e.g., conventional rate-based): estimates network bandwidth from recent segment download speed. Selects the highest bitrate that the estimated throughput can support with a safety margin. **Pros**: simple, low latency, works well on stable networks. **Cons**: poor performance on variable networks (cellular), overestimates on buffer bloat, underestimates on short transfers. Best for **stable home WiFi** connections. (2) **Buffer-based ABR** (e.g., BOLA, PANDA): monitors buffer fill level. If buffer is high (plenty of content queued), select a higher bitrate. If buffer is low (risk of underrun), select a lower bitrate. **Pros**: robust to bandwidth estimation errors, adapts smoothly. **Cons**: slow to react to sudden drops (may buffer until the next segment request). Best for **long-form content** (movies, TV shows) where the user tolerates initial buffering for higher quality. (3) **Model-based ABR** (e.g., MPEG-DASH SAND, Pensieve): uses a machine learning model (RL or supervised) trained on real-world network traces. The model takes features: recent throughput, buffer level, segment sizes, device type. Output: which bitrate to select. **Pros**: optimal for the target metric (e.g., maximize quality while minimizing rebuffers). **Cons**: needs training data, may not generalize to unseen network conditions. Best for **mobile/cellular** where network variability is high. (4) **YouTube's approach**: hybrid — **CPA (Content-Aware ABR)**: uses both throughput estimates and buffer occupancy, plus model-based predictions for bitrate transitions. YouTube also uses **per-title ABR** (different bitrate ladders per video) and **chunk-level ABR** (different bitrate within the same video for high-motion vs low-motion segments). Result: 30% less rebuffering than throughput-only ABR.
+
+---
+
+## Q23: Design a content moderation pipeline for video uploads that combines perceptual hash matching (for known illegal content) with ML-based classification (for policy violations) at YouTube scale.
+
+**Answer:** **Multi-stage moderation pipeline**: (1) **stage 1 — perceptual hash matching** (pre-filter): (a) extract video fingerprints: **PDQ hash** (Facebook's PhotoDNA equivalent for video), **MD5** of the first and last frames, and **audio fingerprint** (AudioID / Shazam-like spectrogram hash). (b) compare against a database of hashes for illegal content (CSAM, terrorist content). The database is distributed across 1000 nodes in a hash ring (consistent hashing). (c) match in <100ms per upload. On match → block immediately (human review queue). (2) **stage 2 — ML classification**: (a) sample keyframes from the video (1 frame per 5 seconds). Run a **multi-label classification model** (e.g., YouTube's Content ID uses a CNN + RNN for video-level classification). Labels: violence, hate speech, nudity, spam, copyright. (b) **audio classification** — transcribe audio with ASR (speech-to-text), run text classification on the transcript for hate speech, misinformation. (c) **OCR classification** — extract text from video frames (titles, subtitles overlaid on the video) and classify for spam/policy. (3) **stage 3 — human review**: if the ML model is uncertain (confidence 0.3-0.7), escalate to human reviewers. The human review queue is prioritized by: (a) confidence score (lower confidence = higher priority), (b) creator reputation (new creators get faster review), (c) view velocity (a video going viral needs faster review). (4) **hash database maintenance** — the perceptual hash database is updated daily from new known-violation content (from law enforcement, user reports, and manual review). (5) **monitoring**: `moderation_latency_p50/p99` (time from upload → moderation decision), `false_positive_rate` (legitimate content blocked — target <0.1%), `false_negative_rate` (violations missed — target <0.01%). (6) **appeal process**: if a video is incorrectly flagged, the creator can appeal. The appeal goes to a human reviewer who can override within 24 hours. The override is fed back as a training example to the ML model.
+
+---
+
+## Q24: Design a recommendation system using a two-tower neural network model. How do you train and serve embeddings for 500M users and 1B videos?
+
+**Answer:** **Two-tower model architecture**: (1) **user tower**: maps user features (watch history, search history, demographics, device) to a 128-dimensional embedding. Input: sparse features (500M users, 10M video IDs) → embedding lookup → average pooling → DNN → user embedding. (2) **video tower**: maps video features (title, description, tags, category, upload timestamp, video embedding from content model) to a 128-dimensional embedding. Input: sparse features (1B videos) → embedding lookup → DNN → video embedding. (3) **training**: (a) loss function: **sampled softmax** with in-batch negatives. For each user-video click pair, maximize the dot product of user and video embeddings for positive pairs, minimize for negative pairs (randomly sampled videos). (b) distributed training: **TPU pods** or **GPU clusters** (256+ accelerators). Training data: 30 days of user interactions (~100B events). Training time: ~3 days for full model convergence. (4) **inference**: (a) **user embedding** is computed on-the-fly at request time (user features → DNN → 128-dim vector). Latency: <10ms on a GPU or <50ms on CPU with optimized ONNX runtime. (b) **video embeddings** are precomputed offline (batch job, runs daily). (c) **ANN search**: the user embedding is used to query an **ANN (Approximate Nearest Neighbor)** index over all 1B video embeddings. Use **ScANN** (Google's scalable nearest neighbors) or **FAISS** with HNSW (Hierarchical Navigable Small World) index. 1B 128-dim vectors → ~500GB. HNSW index: ~200GB (additional). Search latency: <5ms per query (p99). Recall@100: >90%. (5) **candidate generation**: the ANN search returns the top-100 video candidates. These are passed to the ranking model (deep cross-network) for final scoring. (6) **monitoring**: `recommendation_latency_p99` (target <50ms for candidate generation + ranking), `embedding_staleness` (how old are the video embeddings — target <24 hours), `ann_recall` (target >90%).
+
+---
+
+## Q25: Design a video transcoding pipeline with GPU acceleration. How do you manage the workload across a heterogeneous GPU fleet (NVIDIA, AMD, Intel)?
+
+**Answer:** **GPU-accelerated transcoding with workload-aware scheduling**: (1) **input splitting**: the raw video is split into 10-second chunks (transcoding units). Each chunk is transcoded independently — this enables massive parallelism. (2) **GPU pipeline per chunk**: (a) decode the chunk on GPU (NVENC/VAAPI), (b) resize to target resolutions (144p, 240p, 360p, 480p, 720p, 1080p, 4K), (c) encode each resolution to the target codecs (H.264, H.265/HEVC, VP9, AV1). (3) **GPU type selection**: (a) **NVIDIA NVENC** — best for H.264/H.265 encoding. Fast, low power. Handles 4× 1080p encodes per GPU. (b) **AMD VCE** — competitive for H.264/H.265. Slightly lower quality than NVENC at same bitrate. (c) **Intel QSV** — best for quick sync (low-power, integrated). Good for 1080p and below. (d) **CPU (x264)** — used for AV1 encoding (no GPU encoder widely available for AV1 until recently). Slower but better compression for 4K. (4) **workload scheduler**: the scheduler maintains a pool of GPU instances grouped by capability. Each transcoding job is assigned to the most suitable GPU type based on: (a) required codec, (b) resolution, (c) deadline (live transcoding uses faster GPU types, batch uses slower/cheaper), (d) cost (spot instances for non-urgent jobs). (5) **quality monitoring**: after transcoding, compute VMAF for each chunk. If VMAF < 85 for the target bitrate, the chunk is re-encoded with a different encoder or higher bitrate. (6) **auto-scaling**: transcoding job queue depth is monitored. If depth > 100K pending chunks, auto-provision more GPU instances (spot/preemptible for cost savings). If depth < 10K, scale down. (7) **monitoring**: `transcoding_throughput` (chunks/hour), `gpu_utilization` (target >80%), `transcoding_cost_per_minute` (target: <$0.01/minute for 1080p video).
+
+---
+
+## Q26: Design the upload processing queue with priority tiers. How do you handle a traffic spike (10× normal upload rate) without losing uploads or degrading the user experience?
+
+**Answer:** **Priority-tiered upload queue**: (1) **priority tiers**: (a) **P0 (real-time)** — live streaming segments. Must be processed within 1 second. (b) **P1 (high)** — uploads from verified creators (monetized channels). Processed within 5 minutes. (c) **P2 (normal)** — standard uploads from established creators. Processed within 30 minutes. (d) **P3 (bulk)** — uploads from new creators, batch imports. Processed within 24 hours. (2) **admission control**: each tier has a maximum concurrency limit. If P3's queue depth exceeds 1M, new P3 uploads receive a "We're experiencing high traffic — your video will be processed within 24 hours" message. P0 and P1 are never rejected (their concurrency limits are higher). (3) **elastic worker pool**: the transcoding worker pool auto-scales based on queue depth. P0/P1 workers are provisioned on-demand (guaranteed instances). P2/P3 workers use spot/preemptible instances (cost-efficient). During a 10× spike, P2/P3 workers scale to absorb the load. (4) **upload acknowledgment**: the client receives an immediate `upload_accepted` response (within 1 second of upload completion). The video is "processing" status. The client can poll the status endpoint: `GET /videos/{id}/status`. During a spike, polling returns "Processing (estimated time: 45 minutes)." (5) **backpressure**: if the entire system is at capacity (all queues full), the API gateway returns HTTP 503 with a `Retry-After` header (60 seconds). The client retries the upload after 60 seconds (with exponential backoff). (6) **dead letter queue**: any upload that fails to process after 3 retries is moved to a DLQ. The DLQ is reviewed by operations every 4 hours. During a spike, the DLQ may grow — that's acceptable as long as no uploads are lost. (7) **monitoring**: `upload_queue_depth_per_tier`, `upload_processing_time_p50/p99`, `upload_loss_rate` (uploads that were accepted but never processed — target zero). During a spike, alert if P0 queue depth exceeds 100 (transcoding is falling behind live).
+
+---
+
+## Q27: Design a live streaming latency optimization system. How do you achieve sub-1-second latency for interactive live streams while maintaining quality for passive viewers?
+
+**Answer:** **Dual-mode live streaming**: (1) **low-latency mode (interactive)**: (a) **ingest**: streamer sends SRT (Secure Reliable Transport) to the nearest regional ingest. SRT has built-in error correction and retransmission, optimized for live. (b) **segmentation**: 0.5-second segments (HLS LL-HLS). The encoder outputs a new segment every 0.5 seconds with a "partial segment" hint (preload hint) that tells the player to fetch the in-progress segment immediately. (c) **delivery**: use **WebRTC via an SFU (Selective Forwarding Unit)** for sub-1-second latency. The SFU selectively forwards the streamer's video/audio to viewers without transcoding (passthrough). Target: 500ms end-to-end. (2) **normal mode (passive)**: (a) use HLS with 2-second segments and standard CDN delivery. Latency: 5-10 seconds. (b) This mode is used for viewers who joined late, watch on the web, or are on slow connections. (3) **adaptive mode switching**: (a) the server detects that a viewer is interacting (sending chat messages, reacting with emojis) → switch to low-latency mode (WebRTC). (b) if the viewer is passive (just watching) → switch to normal mode (HLS). (c) the switch is seamless: the player transitions from HLS to WebRTC (or vice versa) without interrupting playback. (4) **CDN optimization for live**: (a) use a **live-optimized CDN** with origin shielding and segment prefetching. (b) the CDN maintains a persistent connection to the origin (no reconnect per segment). (c) use **chunked transfer encoding** (HTTP/2 server push) to deliver segments as they are produced. (5) **monitoring**: `live_latency_p50/p99` (end-to-end from streamer → viewer), `mode_switch_count` (how often users switch between low-latency and normal mode).
+
+---
+
+## Q28: Design a thumbnail selection system that automatically picks the most clickable frame from a video using click-through rate prediction.
+
+**Answer:** **Thumbnail CTR prediction model**: (1) **frame extraction**: extract keyframes from the video at 1-second intervals. For each frame, run: (a) **face detection** — does the frame contain a face? Faces increase CTR by 30%. (b) **blur detection** — is the frame blurry? Blurry frames decrease CTR. (c) **text detection** (OCR) — does the frame contain text? Text increases CTR for tutorial/news videos. (d) **brightness/contrast** — well-lit, high-contrast frames perform better. (2) **CTR prediction model**: a lightweight neural network (MobileNet or EfficientNet-Lite) that takes the frame as input and outputs a predicted CTR score. The model is trained on historical thumbnail CTR data (what frames users clicked on). Training data: 100M thumbnail impressions from existing videos. (3) **candidate generation**: select the top 10 frames by predicted CTR. Present them to the creator as thumbnail options (ranked). The creator can select the best one or upload a custom image. (4) **A/B testing**: for the first 24 hours after upload, automatically test the top-3 thumbnails: serve each to 33% of viewers. After 24 hours, pick the winner (highest CTR) as the permanent thumbnail. (5) **video-specific tuning**: the model is fine-tuned per video category: gaming thumbnails should be high-energy (bright colors, action), educational thumbnails should have text overlays, vlog thumbnails should have faces. (6) **mobile optimization**: mobile thumbnails are smaller. The model evaluates frames at 256×144 resolution for mobile (vs 1280×720 for desktop). Frames with large, centered faces perform better on mobile. (7) **monitoring**: `thumbnail_ctr_lift` (CTR of model-selected thumbnails vs random thumbnails — target >20% improvement), `thumbnail_selection_latency` (time from upload to thumbnail candidates ready — target <30 seconds).
+
+---
+
+## Q29: Design a copyright detection system (Content ID) that matches uploaded videos against a database of reference media using audio and video fingerprinting at YouTube scale.
+
+**Answer:** **Content ID fingerprinting pipeline**: (1) **reference database**: copyright holders upload reference media (audio tracks, video files, compositions). Each reference is fingerprinted at ingest: (a) **audio fingerprint** — spectrogram-based (similar to Shazam): extract peak points in the time-frequency spectrogram. Each peak → hash of (freq1, freq2, time_delta). Store in a hash table: `audio_hash → (reference_id, timestamp_offset)`. (b) **video fingerprint** — frame-level perceptual hash (PDQ or dHash). Sample 1 frame per 2 seconds. Hash each frame with a 256-bit PDQ hash. Store in a similarity search index (FAISS or custom ANN). (2) **upload fingerprinting**: for each uploaded video, extract the same fingerprints. Compare: (a) **audio match**: query the audio hash table. If >70% of the upload's audio peaks match a reference with consistent timestamp offsets → audio match. (b) **video match**: query the PDQ hash index. If >60% of frames match a reference → video match. (c) **combined match**: both audio and video match → high confidence (99.9%). (3) **claim types**: (a) **block** — video is blocked worldwide (for copyright holders who want no exposure). (b) **monetize** — ads are shown on the video; revenue goes to the copyright holder. (c) **track** — video is allowed but viewing statistics are tracked. (4) **dispute resolution**: if a creator disputes a Content ID claim, the dispute goes to the copyright holder for review. If not resolved, the dispute escalates to YouTube's human review team. The dispute rate is monitored: if a copyright holder's claims have >10% dispute rate, their claims are reviewed more carefully. (5) **scale**: the reference database has 100M+ tracks and videos. Audio fingerprint index: ~10TB. Video fingerprint index: ~100TB. Indexed in a distributed cluster (200 nodes). Query latency: <500ms for audio, <2 seconds for video. (6) **monitoring**: `content_id_match_rate` (uploads with at least one match — target: matches 0.5% of uploads), `false_positive_rate` (incorrect matches — target <0.01%), `dispute_rate` (disputed claims / total claims — target <2%).
+
+---
+
+## Q30: Design a watch history personalization storage system that stores viewing history, likes, dislikes, and watch time for 500M users with <5ms query latency.
+
+**Answer:** **Columnar storage with row-oriented caches**: (1) **storage backend**: use **Cassandra** (or ScyllaDB) with the following schema: (a) `watch_history` table: `CREATE TABLE watch_history (user_id text, watched_at timestamp, video_id text, watch_time_seconds int, liked boolean, PRIMARY KEY (user_id, watched_at, video_id)) WITH CLUSTERING ORDER BY (watched_at DESC)`. (b) `user_video_interactions` table: `CREATE TABLE user_video_interactions (user_id text, video_id text, last_watched_at timestamp, total_watch_time int, liked boolean, PRIMARY KEY (user_id, video_id))`. (2) **write path**: when a user finishes watching a video, the client sends a batch of events: (a) `INSERT INTO watch_history (user_id, watched_at, video_id, watch_time, liked) VALUES (?)`. (b) `UPDATE user_video_interactions SET last_watched_at = ?, total_watch_time = total_watch_time + ?, liked = ? WHERE user_id = ? AND video_id = ?`. The batch is small (~1KB) and writes to a single partition (bounded by user_id). Write latency: <10ms p99 on Cassandra. (3) **read path**: (a) "history page" query: `SELECT * FROM watch_history WHERE user_id = ? ORDER BY watched_at DESC LIMIT 20` → single partition range query, <5ms. (b) "did user watch video X?" query: `SELECT * FROM user_video_interactions WHERE user_id = ? AND video_id = ?` → single row lookup, <3ms. (4) **caching**: for hot users (active in the last hour), keep the last 50 watch history entries in Redis: `ZADD user:{id}:history {timestamp} {video_id}`. TTL: 2 hours. This serves the "recent history" page without hitting Cassandra. (5) **time-partitioning**: `watch_history` is time-partitioned: data older than 90 days is moved to a separate table `watch_history_archive` with a different compaction strategy (SizeTieredCompaction, less read pressure). Queries for history older than 90 days are slower (~100ms) but rare (<1% of queries). (6) **personalization features**: the `user_video_interactions` table serves as the feature store for the recommendation system. The ML pipeline scans this table daily to extract: `user_id → [watched_video_ids, total_watch_time_per_video, liked_video_ids]`. (7) **monitoring**: `watch_history_write_latency_p99` (<10ms), `watch_history_read_latency_p99` (<5ms for recent history, <100ms for archive). Alert if latency exceeds thresholds for >5 minutes.
+
+---
 

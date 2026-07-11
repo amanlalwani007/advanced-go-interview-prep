@@ -2,111 +2,41 @@
 
 ## Q1: When storing a massive Trie structure containing billions of search phrases across a distributed Redis cluster, which sharding strategy prevents severe hotspots when a letter like 'c' or 't' starts a disproportionate number of English queries?
 
-**Options:**
-
-- Shard the cluster based strictly on the first character of the search phrase.
-- Use consistent hashing on a fixed-length prefix string (e.g., the first two or three characters) or compute a hash of the entire phrase to distribute lookup roots uniformly across the cluster.
-- Store the entire Trie on a single monolithic master node using virtual memory paging structures.
-- Partition the Trie layers based on the total character length of the complete text phrase.
-
 **Answer:** Use consistent hashing on a fixed-length prefix string (e.g., the first two or three characters) or compute a hash of the entire phrase to distribute lookup roots uniformly across the cluster.
 
 ## Q2: To meet a strict sub-10ms read latency budget for autocomplete suggestions on mobile network connections, which client-side browser optimization reduces redundant API round-trips?
-
-**Options:**
-
-- Forcing the client app to run a full Trie construction loop locally using raw server data dumps.
-- Implement Debouncing on keypress events paired with a short-lived client-side memory cache (e.g., LocalStorage) to store suggestions for recently typed prefixes.
-- Convert all mobile client traffic to communicate via synchronous single-threaded REST channels.
-- Configure the client application to poll the server gateways using raw UDP broadcast frames.
 
 **Answer:** Implement Debouncing on keypress events paired with a short-lived client-side memory cache (e.g., LocalStorage) to store suggestions for recently typed prefixes.
 
 ## Q3: What is the primary performance downside of computing the top 5 most popular suggestions dynamically using a standard Trie traversal algorithm on the real-time query path?
 
-**Options:**
-
-- Standard Tries lose the ability to store alphanumeric character types inside terminal leaf blocks.
-- Traversing down all possible child nodes from a given prefix and sorting them by frequency at runtime introduces a time complexity of O(V + E), creating high latency blocks under heavy concurrent traffic.
-- It automatically shifts the transport protocol infrastructure from HTTPS over to raw SMTP tunnels.
-- It causes immediate data block fragmentation across your persistent object storage buckets.
-
 **Answer:** Traversing down all possible child nodes from a given prefix and sorting them by frequency at runtime introduces a time complexity of O(V + E), creating high latency blocks under heavy concurrent traffic.
 
 ## Q4: When a user types a search query and hits 'Enter', how should the phrase's popularity frequency be recorded to ensure the system is durable without slowing down the critical user search path?
-
-**Options:**
-
-- Execute an immediate synchronous write statement to update an auto-increment counter row in a core SQL cluster table.
-- Asynchronously emit the search log event to a message broker like Apache Kafka, allowing decoupled downstream analytics pipelines to process and aggregate logs out-of-band.
-- Force the client browser to keep the socket open until the master database flushes its cache disks.
-- Save the data directly into temporary local system files inside the edge load balancer's host OS containers.
 
 **Answer:** Asynchronously emit the search log event to a message broker like Apache Kafka, allowing decoupled downstream analytics pipelines to process and aggregate logs out-of-band.
 
 ## Q5: How does an analytics engine like Apache Flink blend real-time trending topics with the historical popularity scores stored inside a master Autocomplete Trie database?
 
-**Options:**
-
-- By executing a full database re-indexing script every 10 seconds across the global shards.
-- Flink monitors short sliding windows of incoming search logs to compute velocity scores for surging keywords, pushing immediate micro-updates to override or blend with the cache tier's historical Top-K arrays.
-- By dropping all historical data records automatically to make space for the fresh live parameters.
-- It converts all text query fields into flat, unindexed Base64 string arrays.
-
 **Answer:** Flink monitors short sliding windows of incoming search logs to compute velocity scores for surging keywords, pushing immediate micro-updates to override or blend with the cache tier's historical Top-K arrays.
 
 ## Q6: Why is it structurally critical to limit the maximum character depth of the distributed Autocomplete Trie (e.g., capping prefix tracking at 20 characters)?
-
-**Options:**
-
-- Memory caches are fundamentally unable to parse string attributes longer than 20 characters.
-- It places a strict upper bound on the tree depth, ensuring the maximum search time complexity remains constant at O(1) relative to total database phrase counts, while protecting memory assets from long tail pollution.
-- It changes the network transport framing structures to run over raw UDP broadcast formats.
-- Longer character configurations automatically invalidate edge load balancer proxy routing configurations.
 
 **Answer:** It places a strict upper bound on the tree depth, ensuring the maximum search time complexity remains constant at O(1) relative to total database phrase counts, while protecting memory assets from long tail pollution.
 
 ## Q7: When a business requirement demands the immediate censorship or removal of offensive suggestions from the autocomplete system, how should this be executed without introducing read-latency overhead?
 
-**Options:**
-
-- Rebuild the entire multi-terabyte master Trie database from scratch immediately.
-- Maintain a highly optimized, bloom-filter or in-memory hash set of blocked phrases at the API Gateway or Service tier to filter out matched suggestions on the read path instantly.
-- Force all client browser applications to purge their hardware local memory files every minute.
-- Convert all text query fields into flat, unindexed binary rows inside relational databases.
-
 **Answer:** Maintain a highly optimized, bloom-filter or in-memory hash set of blocked phrases at the API Gateway or Service tier to filter out matched suggestions on the read path instantly.
 
 ## Q8: If your search autocomplete service is deployed globally across multiple regions, how do you minimize lookup latency for international users while keeping suggestion metrics accurate?
-
-**Options:**
-
-- Route all international lookups to a single master database cluster in a single region.
-- Deploy read-only replicas of the aggregated Trie cache cluster locally in each geographic region, routing user queries to the nearest region via Anycast or GeoDNS.
-- Force all international user queries to run over slow, single-threaded serialized network connection lines.
-- Convert the Trie cache keyspace to use random string sequences across regions.
 
 **Answer:** Deploy read-only replicas of the aggregated Trie cache cluster locally in each geographic region, routing user queries to the nearest region via Anycast or GeoDNS.
 
 ## Q9: What is the primary trade-off when configuring your offline aggregation batch workers to run every 1 hour instead of every 24 hours?
 
-**Options:**
-
-- Hourly runs completely eliminate the need for rate limiters at the edge gateway tier.
-- It keeps historical suggestions fresher, but massively increases compute costs and database write contention due to continuous, resource-intensive MapReduce loops.
-- Hourly batch updates automatically compress text files into raw binary streaming formats.
-- It forces downstream memory caches to use single-leader configuration models exclusively.
-
 **Answer:** It keeps historical suggestions fresher, but massively increases compute costs and database write contention due to continuous, resource-intensive MapReduce loops.
 
 ## Q10: When storing pre-compiled Top-K suggestion lists inside individual Trie nodes, what happens to memory consumption compared to a standard baseline Trie data structure?
-
-**Options:**
-
-- Memory consumption drops significantly because child node pointers are removed.
-- Memory footprint increases because each prefix node duplicates and houses string arrays of its top completions, trading RAM capacity for ultra-fast lookups.
-- The memory cache automatically shifts its storage footprint onto external cold object storage disk drives.
-- The total bit width of individual character fields compresses down to a single bit footprint.
 
 **Answer:** Memory footprint increases because each prefix node duplicates and houses string arrays of its top completions, trading RAM capacity for ultra-fast lookups.
 
@@ -151,4 +81,65 @@
 ## Q20: Your autocomplete service is deployed globally. A user in Japan types "東" (the first character of "Tokyo" in Japanese). The autocomplete should suggest "東京", "東京都", "東日本", etc. However, your Trie is built from English queries and does not cover CJK characters well. Design a multilingual autocomplete that handles CJK, Arabic, and emoji input gracefully.
 
 **Answer:** **Unicode-aware Trie with character n-gram index**: (1) **CJK challenge** — CJK characters represent whole words, not letters. A prefix Trie on individual characters works, but the branching factor is huge (50K+ CJK characters). A Trie node for "東" would have thousands of children → memory explosion. Solution: use a **bigram/trigram index** instead of a character Trie. For each CJK query, break it into overlapping 2-grams: "東京" → ["東京", "京都"]. Store 2-grams as keys in a hash map, each pointing to a sorted set of completions. (2) **read path** — for input "東", the system queries `2-gram_index["東"]` (all 2-grams starting with 東). This returns ["東京", "東京都", "東日本", ...] sorted by frequency. Performance: single hash lookup + ZRANGE → <2ms. (3) **Arabic/Farsi** — Arabic joins characters contextually (initial, medial, final forms). Normalize input by converting to Unicode NFC normalization (decomposed form) and strip diacritics. Use the same n-gram index approach. (4) **emoji** — emoji are multi-byte Unicode sequences. Store them as-is in a separate **emoji index** (a smaller hash map keyed by complete emoji or emoji sequences). On input, if the character is classified as an emoji (Unicode block `Emoticons`, `Miscellaneous Symbols`, etc.), query the emoji index instead of the Trie. (5) **language detection** — at the API gateway, classify the input's script via Unicode block detection (CJK: `\p{Han}`, Arabic: `\p{Arabic}`, Latin: `\p{Latin}`). Route to the appropriate index. For mixed input (e.g., "東京 2024"), query both CJK and Latin indices and merge results. (6) **storage** — CJK n-gram index: ~50GB (compressed). Arabic index: ~10GB. Emoji index: <1GB. Latin Trie: ~150GB. Total: ~210GB — feasible for a single Redis Cluster. (7) **monitoring** — track `autocomplete_p99_by_language`. CJK and Arabic should be <10ms. If not, the n-gram index may need optimization (more shards for hot CJK prefixes).
+
+
+## Q21: Design a personalization layer for autocomplete that blends global popularity with user-specific search history and preferences. How do you avoid the "filter bubble" where suggestions become too narrow?
+
+**Answer:** **Blended ranking with diversity injection**: (1) **score formula**: `final_score = α × global_popularity + β × user_affinity + γ × recency_boost + δ × diversity_bonus`. α, β, γ, δ are learned per-user via Bayesian optimization. (2) **user affinity features**: (a) historical query frequency (how often the user searched this term), (b) click-through rate (did the user click on this suggestion before?), (c) category affinity (does the user prefer "tech" over "sports"?), (d) session context (what did the user search for in the last 10 minutes?). (3) **filter bubble prevention**: (a) **diversity bonus** — boost suggestions from categories the user has NOT recently engaged with. Score = `1 + diversity_boost × (1 - recent_category_frequency)`. (b) **forced exploration** — in 10% of autocomplete responses, replace the 5th suggestion with a random suggestion from the user's non-dominant categories. (c) **popularity floor** — the top 3 suggestions must include at least 1 globally popular suggestion (even if the user's affinity is low). (4) **storage**: user affinity features are stored in a Redis hash per user (key: `personalization:{user_id}`, TTL: 7 days). The user profile is updated asynchronously as the user searches. (5) **cold start** — for new users with no history, α (global popularity) is 1.0 and β is 0. As the user accumulates searches, β increases: `β = min(0.7, searches/100 * 0.7)`. (6) **monitoring** — `personalization_diversity_score` (Shannon entropy of suggestion categories — target >0.7 for healthy diversity), `suggestion_click_rate` (are personalized suggestions clicked more than global ones?).
+
+---
+
+## Q22: Design a multi-lingual autocomplete system that handles tokenization for languages without spaces (CJK, Thai, Khmer) and right-to-left languages (Arabic, Hebrew, Persian).
+
+**Answer:** **Language-aware tokenization pipeline**: (1) **language detection** — at the API gateway, detect the input's language via Unicode block analysis or a fast language detector (CLD3). Route to the appropriate Tokenizer + Trie pair. (2) **CJK tokenization**: (a) **Chinese** — use **Jieba** or **HanLP** for word segmentation. Segment the query into words, build a prefix Trie over the segmented words. For CJK input "我喜欢编程", the Trie stores ["我", "喜欢", "编程"] as tokens. (b) **Japanese** — use **Kuromoji** (MeCab) for morphological analysis. Japanese has multiple scripts (Kanji, Hiragana, Katakana) that must be tokenized separately. (c) **Korean** — use **Okt** (Open Korean Text) or **Mecab-ko** for morpheme analysis. Korean has postpositions and verb endings that need stemming. (3) **Thai/Khmer/Lao**: these languages have no spaces and complex syllable structures. Use a **dictionary-based longest-match tokenizer** (e.g., ICU BreakIterator with a dictionary). The tokenizer scans the input character by character, matching against a dictionary of known words. (4) **Arabic/Hebrew (RTL)**: (a) use **Farasa** (Arabic) or **HebMorph** (Hebrew) for morphological analysis. Tokenize by prefix-stem-suffix: Arabic words have complex morphology (e.g., "wasyktbwnha" = "and they will write it"). (b) the Trie stores the normalized stem. On query input, input is normalized before lookup. (5) **mixed-language input**: for queries that mix scripts (e.g., "iPhone 15 价格"), segment by script boundary and tokenize each segment separately. (6) **storage**: maintain separate Trie shards per language group (CJK, Latin, Arabic, etc.). The total memory for CJK Trie is ~50GB (vs 150GB for a combined Trie). (7) **monitoring** — `autocomplete_latency_by_language`, `tokenization_success_rate`. Target: p99 < 20ms for all languages. If CJK latency exceeds 20ms, the word segmentation dictionary needs optimization.
+
+---
+
+## Q23: How do you detect and surface trending queries in real-time for autocomplete? Design a streaming pipeline that identifies rapidly rising queries within 1 minute of trend onset.
+
+**Answer:** **Flink streaming pipeline for trend detection**: (1) **input**: real-time search query stream from Kafka. Each event: `{query, timestamp, user_id, session_id, ip}`. (2) **per-query velocity**: Flink computes two sliding window frequencies: (a) short window (1 minute): `f_short`, (b) long window (24 hours): `f_long`. Velocity = `f_short / max(f_long, 1)`. (3) **acceleration detection**: compute the derivative of velocity over the last 3 windows: if `velocity(t) > velocity(t-1) * 3` (3× increase), mark as trending. (4) **query clustering**: group similar queries via SimHash (near-duplicate queries like "iphone 16 release" and "iphone 16 launch date" are merged). This prevents trend fragmentation. (5) **bot/spam filter**: apply the same entropy-based filter as Q21 (source diversity check). A trending query must have >100 unique IPs in the short window to qualify. (6) **trend injection**: trending queries are written to a Redis sorted set `trending_queries` with score = velocity. Every 30 seconds, the autocomplete service reads the top 100 trending queries and boosts their ranking for 10% of users (exploration set). (7) **decay**: trending queries have a half-life of 1 hour. After 2 hours without significant velocity, they are removed from the trending set. (8) **monitoring** — `trend_detection_latency` (time from trend onset → detection, target <60 seconds), `trend_surface_rate` (how many trending queries appear as suggestions — target >90%).
+
+---
+
+## Q24: Design a client-side Trie caching strategy for autocomplete that minimizes network requests. How do you handle stale caches and version updates?
+
+**Answer:** **Hierarchical client cache with version stamps**: (1) **client cache**: the mobile/web client maintains a local Trie for the most common prefixes (top 1000 prefixes by frequency). This is stored in IndexedDB (web) or SQLite (mobile). Size: ~10MB per client. (2) **cache population**: on app startup, the client fetches a compressed bloom-filtered Trie snapshot from the server: `GET /autocomplete/snapshot?v=latest`. The snapshot contains the top-10 suggestions for each of the top 1000 prefixes (~10MB gzipped to ~2MB). (3) **cache eviction**: the client uses an LRU eviction policy: if the local Trie exceeds 10MB, evict the least recently used prefix. (4) **stale cache handling**: (a) each cache entry has a `version_stamp` (monotonically increasing global version). (b) the client sends `version_stamp` with each autocomplete request. (c) the server compares the client's version with the latest: if stale, the response includes the updated entries as a patch. (d) the client applies the patch to the local cache. (5) **incremental updates**: the server publishes real-time updates to a global channel (SSE or WebSocket): `{updated_prefix: "ap", new_suggestions: ["apple", "app"], version_stamp: 12345}`. Connected clients apply these updates instantly. (6) **fallback**: if the local cache has the prefix, render suggestions instantly (<1ms). Then fire a background request to the server to validate the suggestions (update if stale). The UI shows the cached suggestions immediately, then updates them silently. (7) **monitoring** — `client_cache_hit_ratio` (target >95% for the top 1000 prefixes, covering ~80% of all queries), `cache_sync_latency` (time from server update → all connected clients updated — target <5 seconds).
+
+---
+
+## Q25: Design a typo-tolerant autocomplete system using Levenshtein automata. How do you handle edit distance 1 and 2 at scale?
+
+**Answer:** **Levenshtein automaton with precomputed candidates**: (1) **offline precomputation**: for each of the top 1M queries, precompute all **edit distance 1 variants** (insertion, deletion, substitution, transposition — ~1000 variants per query). Store each variant → original query mapping in a Redis hash (key: `typo:{variant}`, value: `[original_query, frequency]`). This requires ~1B entries (1M queries × 1000 variants = 1B). At 50 bytes per entry → 50GB — feasible for a Redis Cluster (10 nodes × 5GB). (2) **read path**: when a user types a query: (a) first, check the exact prefix Trie for completions (normal path). (b) simultaneously, for the full typed string, check the typo map: `GET typo:{input}`. If found and the Trie had 0 completions, return the corrected version as a "Did you mean?" suggestion. (3) **edit distance 2**: for edit distance 2, the number of variants per query is ~1M (too many to precompute). Instead, use a **Levenshtein automaton in software** (UFAL or python-Levenshtein) at query time. But this is O(N) over the dictionary. Optimize: (a) index the dictionary by **character n-grams** (4-grams). A query's 4-grams overlap with its edit distance 2 variants. (b) query the 4-gram index to get candidate queries, then compute edit distance on the filtered set (~1000 candidates). (4) **performance**: edit distance 1: single Redis GET (<1ms). Edit distance 2: 4-gram lookup + candidate filtering ~5ms. Total: <10ms (fits within the 50ms budget). (5) **monitoring**: `typo_correction_surface_rate` (how often a typo correction is shown), `typo_correction_acceptance_rate` (how often users click the correction). If acceptance is <10%, the typo map is noisy.
+
+---
+
+## Q26: How do you handle autocomplete for CJK languages (Chinese, Japanese, Korean) where characters are not space-separated and complex segmentation is needed?
+
+**Answer:** **CJK-specific autocomplete architecture**: (1) **character n-gram index** — instead of a word-level Trie, use a **2-gram (bigram) index** over characters. For Chinese query "北京欢迎你", the bigrams are ["北京", "京欢", "欢迎", "迎你"]. Store each bigram as a key in a hash map, pointing to a sorted set of completions: `bigram:北京 → [北京欢迎你: score, 北京奥运会: score]`. (2) **input processing** — as the user types each character, convert the input to overlapping bigrams. For input "北京", the bigram is ["北京"]. For input "北京欢", bigrams are ["北京", "京欢"]. Query both bigrams, intersect the result sets, and rank by frequency. (3) **Japanese-specific**: Japanese has three scripts (Kanji, Hiragana, Katakana). Use a **segmentation-aware Trie**: (a) segment the input with Kuromoji. (b) store each segment as a node in a compressed Trie. (c) on query input, segment the input and traverse the Trie segment by segment. (4) **Korean-specific**: Korean is written with spaces but verbs are conjugated. Use **morpheme analysis** (Okt/Mecab): stem the query to its dictionary form, then match against a Trie of stemmed entries. (5) **mixed script input**: CJK users often mix native script with English (e.g., "iPhone 14 价格"). Use a **script-splitting tokenizer**: split the input by script boundaries, then query each segment separately. Merge results with a weighted blend (native script results weighted 2× higher than English for a CJK user). (6) **memory optimization**: the bigram index for Chinese is ~20GB (compressed). Japanese morpheme Trie: ~15GB. Korean stemmed Trie: ~10GB. Combined: ~50GB — feasible for a dedicated CJK Redis Cluster. (7) **monitoring**: `cjk_autocomplete_latency_p99` (target <20ms), `cjk_correct_segmentation_rate` (is the segmentation producing the expected words? — target >95%).
+
+---
+
+## Q27: Design a profanity and PII filtering system for autocomplete suggestions. How do you filter in real-time without blocking legitimate suggestions?
+
+**Answer:** **Multi-layer content filter**: (1) **profanity filter**: (a) **Bloom filter** of known profanity words (50K entries, ~0.5MB). Any suggestion matching a profanity word is rejected in O(1). (b) **regex pattern matcher** for leetspeak variants (e.g., "h4t3", "f*ck", "s#!t") and phonetic substitutions. Updated weekly from moderation team reports. (c) **ML toxicity classifier** — a lightweight ONNX model (DistilBERT distilled to 5MB) that scores each suggestion for toxicity. It catches contextual profanity that exact-match filters miss (e.g., "that's the bomb" is not profanity but "bomb" alone might be flagged). Run on the top-100 new suggestions every hour (not at query time). (2) **PII filter**: (a) **regex patterns** for email addresses, phone numbers, social security numbers, credit card numbers, IP addresses. Any suggestion matching a PII pattern is rejected. (b) **entity recognition** — a small NER model (Spacy or ONNX) for names, addresses, and dates. Suggestions containing PII are rejected. (3) **allowlist override**: some legitimate queries overlap with profanity (e.g., "cocktail recipe", "bastard fish"). The moderation team maintains an allowlist of `{word, context}` tuples. If the query's prefix suggests a legitimate context, the filter is bypassed. (4) **performance**: the entire filter stack (Bloom + regex + ML) runs in <50μs per suggestion — well within the autocomplete budget. For a top-10 list, total filter time <500μs. (5) **real-time updates**: when the moderation team adds a new blocked word, it is propagated to all edge caches within 10 seconds via Redis PubSub. (6) **monitoring**: `suggestion_filter_rate` (percentage of suggestions blocked — target <2% of legitimate suggestions blocked), `false_positive_rate` (blocked suggestions that users would have typed — target <0.1%).
+
+---
+
+## Q28: Design an A/B testing framework for autocomplete ranking. How do you test new ranking algorithms without degrading user experience?
+
+**Answer:** **Shadow-gradual A/B testing**: (1) **shadow mode**: deploy the new ranking algorithm (variant) alongside the production algorithm (control). For each request, compute both rankings but return the control to the user. Log both variants' results to Kafka. (2) **offline evaluation**: process the logs daily. Compare: (a) suggestion click rate (did the user click a suggestion from the control? If yes, was the variant's suggestion also in the top-5?), (b) zero-input rate (did the user ignore all suggestions and type the full query?), (c) first-suggestion match (was the user's final query in the variant's top-3 suggestions?). (3) **gradual rollout**: if offline metrics show statistically significant improvement: (a) roll out to 1% of users for 24 hours. Use deterministic bucketing (hash user_id) for sticky assignment. (b) monitor p99 latency (+10% max), error rate (0% increase), and business metrics (search completion rate). (c) if all guardrails pass, roll out to 10% → 50% → 100% over 5 days. (4) **rollback**: the A/B config is in a feature flag (etcd). Flip to 0% to instantly revert to the control. The control model is always deployed alongside the variant (no cold start on rollback). (5) **metrics dashboard**: real-time dashboard shows: (a) control vs variant for each metric, (b) statistical significance (p-value, updated every hour), (c) segment breakdown (mobile/desktop, language, user tier). (6) **monitoring**: `experiment_guardrail_breached` alert — if any guardrail metric exceeds the threshold for >10 minutes, auto-pause the experiment and roll back to 100% control.
+
+---
+
+## Q29: How do you detect and evict stale entries from the autocomplete Trie? What criteria determine staleness and how do you avoid removing entries that may become popular again?
+
+**Answer:** **Frequency-decay eviction**: (1) **staleness criteria**: each Trie entry (query) has a `last_queried_timestamp` and `query_frequency` (7-day moving average). A query is "stale" if: (a) `last_queried_timestamp > 90 days ago` AND (b) `7-day frequency < 1 query/day`. (2) **phased eviction**: (a) **phase 1 — archival** (day 90): move the query from the active Trie to a **cold storage** (compressed Parquet in S3). The query is removed from the in-memory Trie but retained in the archive. (b) **phase 2 — deletion** (day 180): if the query was not revived (re-queried) during the archival period, permanently delete from the archive. (3) **revival detection**: when a user queries a term that is in the cold archive, the system checks the archive (via a Bloom filter in L1 cache). If found, the query is revived: re-inserted into the active Trie with a frequency boost. Revival is triggered within <10ms (single Bloom filter + Redis lookup). (4) **seasonal queries**: some queries are seasonal ("christmas gifts", "summer vacation"). Use a **seasonality model**: if a query had a pattern of high frequency in a specific month for 2+ consecutive years, mark it as seasonal and do NOT evict (keep in Trie year-round with low priority during off-season). (5) **frequency threshold**: the eviction threshold depends on Trie memory pressure. If the Trie is <80% full, be more lenient (evict after 120 days). If >95% full, be aggressive (evict after 30 days). (6) **monitoring**: `trie_eviction_rate_per_day`, `trie_revival_rate` (queries that were revived from archive — target >1% of evictions to validate that archiving is useful), `trie_memory_usage`.
+
+---
+
+## Q30: Design a weighted suggestion system where recent queries have higher weight than older ones. How do you implement exponential decay of query frequency over time?
+
+**Answer:** **Time-decayed frequency counting**: (1) **exponential decay formula**: `weighted_frequency = sum(e^(-λ × (now - query_time)))` for each query occurrence. λ (decay constant) is chosen such that: a query from 24 hours ago has 10% weight: `e^(-λ × 86400) = 0.1` → `λ = ln(10) / 86400 ≈ 2.66 × 10^-5`. (2) **implementation**: (a) store each query event in a time-series database (e.g., Cassandra with TTL of 30 days) keyed by `query`. (b) at batch update time (every hour), compute the decayed frequency: query all events for the query within the last 30 days, compute `sum(e^(-λ × (now - event_time)))`, and update the Trie entry's frequency. (3) **optimization — decay factor per bucket**: instead of storing each event individually, aggregate by hour: for each query, store `{hour_bucket: count}`. Compute decayed frequency = `sum(count_per_hour × e^(-λ × hour_age))`. This reduces storage from O(events) to O(hours × unique_queries). (4) **bounding**: to prevent a single viral query from dominating the suggestions, cap the decayed frequency at 100× the median query frequency. This ensures a viral query from yesterday doesn't push out all other suggestions. (5) **real-time update**: for queries that receive a burst of traffic within the last hour, use a **hot counter** in Redis: `INCR hot:{query}:{hour_bucket}`. The decayed frequency is computed as `hot_counter * decay_factor + cold_frequency`. This gives immediate weight to trending queries without waiting for the hourly batch update. (6) **tuning λ**: for faster decay (trending topics dominate → set λ higher, e.g., 2× standard). For slower decay (evergreen content dominates → set λ lower, e.g., 0.5× standard). λ can be configured per query category (news vs entertainment vs reference). (7) **monitoring**: `suggestion_freshness` (average age of suggestions shown — target <7 days), `viral_query_dominance` (percentage of suggestions from viral queries — alert if >30%).
+
+---
 

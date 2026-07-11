@@ -2,111 +2,41 @@
 
 ## Q1: When designing a hybrid Fan-Out engine, how should the system dynamically classify an account as a 'celebrity' or high fan-out target to shift them from a Push to a Pull model?
 
-**Options:**
-
-- By calculating the exact string byte length of the user's display name parameters.
-- By applying a dynamic threshold based on raw follower counts and real-time account activity, flagging high-degree graph nodes to bypass the write fan-out queue.
-- By running a synchronous full-table scan across the post history database during every write request.
-- By forcing all accounts created within the last 30 days to use a pull model exclusively.
-
 **Answer:** By applying a dynamic threshold based on raw follower counts and real-time account activity, flagging high-degree graph nodes to bypass the write fan-out queue.
 
 ## Q2: To store a user's pre-compiled news feed timeline in a Redis cluster with maximum memory efficiency and fast pagination support, which data structure represents the best operational choice?
-
-**Options:**
-
-- A standard Redis String containing a large serialized JSON array of all historical posts.
-- A Redis Sorted Set (ZSET) using the post creation timestamp as the score and the 'post_id' as the member value.
-- A flat Redis Hash mapping sequential integer keys to individual raw text payloads.
-- A Redis HyperLogLog structure to maintain chronological appending logic.
 
 **Answer:** A Redis Sorted Set (ZSET) using the post creation timestamp as the score and the 'post_id' as the member value.
 
 ## Q3: A user follows 5,000 active accounts, creating a massive fan-out read merge step if they utilize a pull model. How can you mitigate the read latency of merging these timelines during feed generation?
 
-**Options:**
-
-- Execute 5,000 synchronous individual database SELECT queries sequentially in a linear loop.
-- Parallelize the timeline fetch operations using a scatter-gather pattern with asynchronous workers, combined with strict max-age time limits to only fetch recent active windows.
-- Convert all post timelines into a single unified global monolithic table across one database shard.
-- Force the client browser to make individual network calls to each of the 5,000 followed user accounts.
-
 **Answer:** Parallelize the timeline fetch operations using a scatter-gather pattern with asynchronous workers, combined with strict max-age time limits to only fetch recent active windows.
 
 ## Q4: How do you enforce a hard ceiling on cache memory consumption for inactive users who haven't logged into the news feed application for months?
-
-**Options:**
-
-- Maintain their feeds permanently in high-cost memory arrays to ensure zero-latency retrieval whenever they return.
-- Configure an aggressive Time-To-Live (TTL) on timeline caches, allowing inactive feeds to expire from memory; dynamically reconstruct their feed from cold database storage only when they authenticate again.
-- Run a cron job that randomizes the keyspace characters of inactive users to trigger background eviction errors.
-- Move the inactive timelines into a high-speed local UDP broadcast buffer ring.
 
 **Answer:** Configure an aggressive Time-To-Live (TTL) on timeline caches, allowing inactive feeds to expire from memory; dynamically reconstruct their feed from cold database storage only when they authenticate again.
 
 ## Q5: What is the primary architectural benefit of utilizing 'Feed Pagination' based on a Cursor token (e.g., max_id = post_12345) rather than a simple numeric offset (e.g., LIMIT 10 OFFSET 20)?
 
-**Options:**
-
-- Cursor pagination encrypts the underlying data payloads to defend against interceptors.
-- Numeric offsets cause duplicate entries or skipped items if new posts are published while a user is actively scrolling their feed.
-- Offset pagination requires more network bandwidth because it expands the underlying TCP window sizes.
-- Cursors automatically index unindexed non-relational database tables across distributed shards.
-
 **Answer:** Numeric offsets cause duplicate entries or skipped items if new posts are published while a user is actively scrolling their feed.
 
 ## Q6: When a user deletes a published post, how should the Fan-Out engine clean up the pre-compiled timelines cached inside Redis across millions of followers?
-
-**Options:**
-
-- The system runs a synchronous sweep across all cache clusters, deleting the keys completely.
-- An asynchronous worker pool consumes a post-deletion event from Kafka and issues optimized background `ZREM` batch updates to remove that specific post_id from active follower sets.
-- The system drops all database index metrics to reset the keyspace.
-- The system forces client devices to undergo an immediate factory data restore loop.
 
 **Answer:** An asynchronous worker pool consumes a post-deletion event from Kafka and issues optimized background `ZREM` batch updates to remove that specific post_id from active follower sets.
 
 ## Q7: What is the core downside of constructing a news feed using a pure client-side pulling structure, where the device merges posts from all creators dynamically at runtime?
 
-**Options:**
-
-- It prevents the browser from formatting human-readable text layers properly.
-- It shifts the heavy computing and network retrieval burden completely to the mobile device, resulting in massive bandwidth consumption, slow loading speeds, and battery drain.
-- It automatically transitions low-level network transport loops from HTTPS over to raw SMTP.
-- It requires cloud providers to drop multi-region database replication layers entirely.
-
 **Answer:** It shifts the heavy computing and network retrieval burden completely to the mobile device, resulting in massive bandwidth consumption, slow loading speeds, and battery drain.
 
 ## Q8: When sharding the primary database that houses historical user posts, which column parameter ensures uniform data scattering across NoSQL cluster rings?
-
-**Options:**
-
-- The raw byte length of the post text payload attributes.
-- The unique `post_id` or a composite key of `user_id + post_id`, spreading rows evenly via consistent hashing.
-- The global 'created_at' date tracking string values.
-- The creator account's public timezone region text block parameters.
 
 **Answer:** The unique `post_id` or a composite key of `user_id + post_id`, spreading rows evenly via consistent hashing.
 
 ## Q9: How do social platforms include highly popular 'Sponsored Ad Posts' into a user's pre-compiled timeline cache cleanly?
 
-**Options:**
-
-- Ads are injected into the pre-compiled feed array dynamically by the application layer at retrieval time, separating ad delivery from standard post data.
-- Every single advertisement is hard-copied into the timeline sets of all global users permanently.
-- Ads are streamed via separate raw UDP broadcast loops to the browser client.
-- The cache tier wipes out all standard post items to leave space for ad frames exclusively.
-
 **Answer:** Ads are injected into the pre-compiled feed array dynamically by the application layer at retrieval time, separating ad delivery from standard post data.
 
 ## Q10: What performance metrics indicate that your News Feed system cache cluster is suffering from memory fragmentation or key exhaustion?
-
-**Options:**
-
-- A sharp drop in cache hit ratio paired with elevated latency spikes as requests pass through to primary relational storage rings.
-- A sudden, automated transition of network proxy endpoints to loopback addresses.
-- An immediate expansion of the raw text field lengths inside metadata tables.
-- A mandatory hard reboot requirement registering on external firewall setups.
 
 **Answer:** A sharp drop in cache hit ratio paired with elevated latency spikes as requests pass through to primary relational storage rings.
 
@@ -151,4 +81,65 @@
 ## Q20: A user reports that their feed shows a post from an account they explicitly blocked 2 years ago. Investigation reveals that the post was "re-shared" by a friend, and the feed ranking model boosted it because of high engagement from the friend's network. The block was bypassed. How do you enforce hard privacy boundaries without degrading the ranking model's effectiveness?
 
 **Answer:** **Hard block filter at the retrieval layer**: (1) **blocklist check before ranking** — the user's blocklist (stored in Redis as a Bloom filter for fast lookup) is checked against every candidate post's author_id BEFORE the post enters the ranking model. If `author_id` is in the blocklist, the post is **removed from the candidate set entirely**. This is non-negotiable — the ranking model never sees blocked accounts, even in re-shared form. (2) **re-share propagation check** — when a friend re-shares a blocked account's post, the system must detect the **original author**. Store the `original_author_id` in the post metadata (even for re-shares). The blocklist check includes both `author_id` and `original_author_id` — if either is blocked, suppress the post. (3) **user-facing feedback** — when a suppressed re-shared post is relevant to the explanation, show the user: "[Friend] shared a post, but it was hidden because it originated from an account you blocked." This builds trust in the block feature. (4) **testing** — add a unit test: "FeedForUserWithBlocklist: given a re-shared post from blocked original author, verify it is excluded from the candidate set." Also a regression test: if an account is newly blocked, verify that all posts from that account (including past re-shares) are removed from the user's pre-compiled feed within 60 seconds. (5) **privacy audit** — quarterly, randomly sample 10K users and verify that their feed contains zero posts from their blocklisted accounts. If any violation is found, escalate to the engineering director. (6) **principal-level insight**: blocklists are a **hard privacy boundary**, not a ranking signal. They must be enforced before the ranking model, not within it. The ranking model should never be allowed to "overrule" a block — that breaks user trust fundamentally.
+
+
+## Q21: Compare fanout-on-write vs fanout-on-read performance at 100M user scale. What is the break-even point where one becomes strictly better than the other?
+
+**Answer:** **Fanout-on-write (push)**: when a user posts, the system writes the post to all followers' pre-compiled feeds (Redis sorted sets). Cost: for a user with 10K followers, 10K Redis ZADD operations. At 100M users with an average of 200 followers each, and 10M daily active posters → 10M × 200 = 2B ZADDs/day. Redis can handle ~1M ops/sec per cluster → need ~2000 Redis nodes. **Fanout-on-read (pull)**: when a user opens their feed, the system fetches posts from all followed accounts and merges. Cost: for a user following 200 accounts, 200 database queries at read time. At 50M daily active readers → 50M × 200 = 10B queries/day. **Break-even analysis**: push cost is proportional to `writers × avg_followers`. Pull cost is proportional to `readers × avg_followees`. For a typical social network: (a) writers << readers (10M vs 50M). (b) avg_followers >> avg_followees (200 vs 200, but power-law skewed: celebrities have millions of followers while most users have <100). (c) the break-even is when `writers × avg_followers = readers × avg_followees`. For normal users (<10K followers) → push is cheaper. For celebrities (>10K followers) → pull is cheaper. **Hybrid strategy**: use push for users with <10K followers (fanout-on-write). Use pull for users with >10K followers (fanout-on-read). Cache celebrity posts in CDN for fast pull. This is the Instagram/Twitter approach.
+
+---
+
+## Q22: Design a feed ranking ML feature store. What features do you compute online vs offline? How do you serve features at <10ms p99?
+
+**Answer:** **Online/offline feature split**: (1) **offline features** (precomputed daily in Spark/Flink, stored in a KV store): (a) user embeddings (from collaborative filtering), (b) post embeddings (from content model), (c) user engagement history (7-day CTR, average session time), (d) post author affinity (how often the user engaged with this author), (e) post freshness decay parameters. (2) **online features** (computed at request time): (a) recency (time since post creation), (b) current engagement velocity (likes/s in last 5 min), (c) device type, (d) time of day, (e) query context (is user scrolling or opening app?). (3) **feature serving**: offline features are stored in a distributed KV store (Redis or Aerospike) keyed by `user_id` and `post_id`. Online features are computed in-line in <1ms. At request time, the ranking service fetches all user features (1 Redis GET, ~1ms) and batch-fetches post features for the candidate pool (100-500 posts → pipeline MGET, ~2ms). Total feature fetch: <5ms. (4) **feature freshness** — offline features are updated daily via a Spark batch job. Critical features (recency, engagement velocity) are updated in real-time via a Flink streaming pipeline. (5) **monitoring** — `feature_fetch_latency_p99`, `feature_staleness` (how old are the offline features?). Alert if any feature is >48 hours stale.
+
+---
+
+## Q23: How do you use vector clocks to track causality in a news feed system? When is causal consistency important for feed correctness?
+
+**Answer:** Vector clocks can track causal relationships between feed events (posts, likes, shares, comments). Each event carries a VC: `[user_id: counter]`. When a user sees their feed, they have a VC representing their last-seen state. Feed items newer than the VC are new. Causal consistency matters for: (1) **comment threads** — if user A posts "Great post!" and user B replies "Thanks!", user B's reply should not appear before user A's comment. A feed sorted by VC ensures this (if reply's VC is causally after the comment, it appears later in the feed). (2) **like counts** — if a user sees a post with 100 likes, then refreshes and sees 99 likes, consistency was violated. VC-based ordering prevents regressions. (3) **edit history** — a post edit should appear as a new event causally after the original post. Implementation challenges: (a) **VC size** — tracking per-user counters across billions of users is infeasible. Use **per-conversation VCs** (track causality only within a post's comment thread). (b) **truncation** — periodically prune old VC entries. (c) **hybrid** — for most feed ranking, wall-clock timestamps with NTP sync are sufficient. VCs are only used for explicitly causal features (comment threads, edit history). This is the approach Twitter uses for its "conversation threading" feature.
+
+---
+
+## Q24: Design a real-time feed update push system using WebSockets. How do you push new posts to followers within 100ms of creation?
+
+**Answer:** **Feed push via WebSocket fan-out**: (1) **author writes a post** → the post creation event is published to a Kafka topic `feed_events`. (2) **fan-out service** consumes from Kafka, looks up the author's followers from a graph database (Redis or Cassandra), and pushes the post to each follower's WebSocket connection. The fan-out service maintains a **session map**: `user_id → [ws_connection_1, ws_connection_2, ...]` in a shared Redis cluster. (3) **push to connected followers**: the fan-out service sends the post to the follower's WebSocket gateway node via an internal RPC (gRPC or Redis PubSub). The gateway node forwards it to the connected WebSocket client. (4) **offline followers**: if the follower is not connected, the fan-out service writes the post to the follower's pre-compiled feed (Redis sorted set) for when they next open the app. (5) **latency budget**: Kafka publish → fan-out → session lookup → RPC → WebSocket send: target <100ms. Use a **dedicated WebSocket gateway** (separate from the HTTP API) to avoid head-of-line blocking. (6) **batch push** — for celebrities with millions of followers, do NOT fan-out per follower. Instead, push a "new post from @elonmusk" notification to followers as a batch (Kafka partition with multiple consumers). Followers fetch the actual post content on demand (pull model for viral content). (7) **monitoring** — `feed_push_latency_p50/p99` (creation → 50% of connected followers receiving push). Target <100ms p50, <500ms p99.
+
+---
+
+## Q25: Design a cursor-based feed pagination system. How do you handle insertion (new posts at the top) without causing duplicate or skipped items?
+
+**Answer:** **Cursor pagination with stable sort**: (1) **cursor encoding** — the cursor is an opaque string encoding `(post_id, created_at, score)` of the last post on the current page. The client sends `cursor=<base64_encoded_value>` to request the next page. (2) **query**: `SELECT ... WHERE (score, created_at, post_id) < (cursor.score, cursor.created_at, cursor.post_id) ORDER BY score DESC, created_at DESC, post_id DESC LIMIT 20`. The three-column key ensures a total ordering even with identical scores and timestamps (post_id breaks ties). (3) **insertion handling**: when new posts are created while the user is scrolling, they have higher `created_at` values than the cursor. Since the query uses `<`, new posts are not included in the next page — they appear at the top when the user refreshes (pulls to refresh). This prevents duplicates and skips. (4) **duplicate prevention** — the client deduplicates by `post_id` on the rendered page. If a post appears in two consecutive pages (due to score changes), the client removes the duplicate. (5) **stale cursor** — if the cursor refers to a post that was deleted, the query falls back to `(score, created_at)` without the post_id — this may return one extra post after the deleted one. The client handles this gracefully (shows the page as-is). (6) **monitoring** — `pagination_latency_p99`, `pagination_duplicate_rate` (percentage of pages with duplicates — target <0.1%).
+
+---
+
+## Q26: How do you detect and handle stale feeds? When should a feed be refreshed and how do you minimize recomputation cost?
+
+**Answer:** **Staleness detection with version stamps**: each user's feed has a `version_stamp` (monotonically increasing integer). The version stamp is incremented when: (a) a followed account posts, (b) a followed account is unfollowed, (c) a liked post's engagement changes significantly, (d) the ranking model is updated. On feed load, the client sends its last-known `version_stamp`. The server compares it to the current version. If stale, the server triggers a feed rebuild (or incremental update). **Incremental update**: instead of rebuilding the entire feed, apply a **delta log**: (1) new posts since the last version are fetched and inserted into the ranked list. (2) deleted posts (from unfollows or account deletion) are removed. (3) the ranking scores of existing posts are updated (some posts may move up or down). The delta is computed in <50ms for 500 posts. **Full rebuild**: only triggered when the ranking model changes (weekly) or when the user hasn't refreshed in 7+ days. The full rebuild re-fetches the last 500 posts from all followed accounts and re-ranks. **Cost optimization**: (1) cache the last-known feed state (Redis sorted set) with TTL = 1 hour. If the user refreshes within the TTL, serve the cached feed (after applying deltas). (2) use a **dirty flag** per user: `feed_dirty:{user_id} → true`. Only rebuild if dirty. Reset after rebuild. (3) monitoring: `feed_rebuild_count`, `feed_delta_size_avg`, `feed_staleness_ratio` (feeds served that were stale — target <5%).
+
+---
+
+## Q27: Design a storage model for multi-type feed items (photos, links, status updates, polls, videos). How do you store heterogeneous content in a single feed?
+
+**Answer:** **Polymorphic feed item storage**: (1) **feed item schema** — each feed item has a common header: `post_id (UUID), author_id, created_at, item_type (ENUM: photo, link, status, poll, video), visibility (public/friends/private), engagement_score (cached like+comment+share count)`. (2) **content body** — store the type-specific content in a **separate table per type** or a **JSONB column** on the feed item table: (a) photo: `{image_urls: [...], caption, filter_used}`, (b) link: `{url, title, description, og_image_url}`, (c) status: `{text}`, (d) poll: `{question, options: [{id, text, vote_count}], expires_at}`, (e) video: `{video_url, thumbnail_url, duration, transcoding_status}`. (3) **query pattern**: when loading a feed, fetch the feed items (SELECT + WHERE user_id = ? ORDER BY created_at DESC LIMIT 20). Then fetch the type-specific content for each item via a **batch-fetch**: `SELECT * FROM photos WHERE post_id IN (...)`, `SELECT * FROM links WHERE post_id IN (...)`, etc. Use async scatter-gather for each type (Go goroutines). (4) **denormalized cache** — in the pre-compiled feed cache (Redis), store a JSON blob with both the header and content body. This avoids the type-specific join at read time. (5) **type-specific indexing** — polls need `expires_at` indexing (for closing polls), videos need `transcoding_status` (for showing only transcoded videos). Use a GSI (global secondary index) for filtering by type + status. (6) **monitoring** — `feed_item_type_distribution` (what % of feed items are photos vs status vs video). Use this to optimize caching (cache video items longer since they are larger but viewed less frequently).
+
+---
+
+## Q28: How do you deduplicate feed items? When a post is shared by multiple followed accounts, how do you show it only once?
+
+**Answer:** **Content-based deduplication**: (1) **share detection** — each post has a `root_post_id` and `share_chain` (the original post ID if this is a share/retweet). Feed items are grouped by `root_post_id`. (2) **dedup at render time** — when building a feed page, collect all candidate post IDs. Use a local in-memory set (Go map or Redis SET) to track seen `root_post_id`s. If a post's `root_post_id` is already in the set, skip it (or show it once with "Alice and 3 others shared this"). (3) **dedup granularity**: (a) **exact duplicate** — same `root_post_id` → show once. (b) **near-duplicate** — similar content (e.g., two different news articles about the same story) → use SimHash to detect near-duplicates and collapse. (4) **display strategy**: (a) first share: show the full post. (b) subsequent shares: show a compact notification: "Bob also shared [post]" or add the user to a "shared by" list on the primary post. (c) user preference: allow users to choose "Show all shares" or "Collapse shares". (5) **ranking impact**: a post shared by multiple followed accounts should get a ranking boost (social proof signal). The dedup system passes the share count to the ranking model as a feature. (6) **monitoring** — `dedup_rate` (percentage of feed candidates removed as duplicates). Target >10% for a well-connected feed. If <1%, the dedup is not working effectively.
+
+---
+
+## Q29: Design a rate-limited feed generation system. How do you prevent a single user from triggering an expensive feed rebuild too frequently?
+
+**Answer:** **Multi-level rate limiting**: (1) **per-user feed refresh rate** — limit feed refreshes to 1 per 30 seconds per user. The client sends a `last_refresh_timestamp`. If `now - last_refresh < 30s`, return the cached feed (even if stale). This is enforced at the API gateway (Redis token bucket keyed by `user_id`). (2) **per-user feed rebuild rate** — limit full feed rebuilds to 1 per 5 minutes. Between rebuilds, apply only delta updates (new posts, removed posts). The delta is computed in <50ms vs a full rebuild in <500ms. (3) **system-level rate** — if the feed service is under load (CPU > 80%), degrade to serving cached feeds only (skip deltas). Set a `max_rebuilds_per_second` cluster-wide. If exceeded, queue rebuild requests and process them at a throttled rate. (4) **priority tiers** — paid users get higher rebuild frequency (every 30 seconds) vs free users (every 5 minutes). This is enforced via a user tier field in the auth token. (5) **client-side throttling** — the mobile app enforces its own 30-second cooldown for pull-to-refresh. When the user pulls to refresh within the cooldown, the app shows a "Pull to refresh" animation but does not make an API call — it uses optimistic local updates. (6) **monitoring** — `feed_refresh_requests_per_second`, `feed_rebuilds_per_second`, `rate_limited_request_count`. If rate_limited > 10% of all requests, the limits may be too aggressive — consider increasing limits or capacity.
+
+---
+
+## Q30: Design a cold start strategy for new users. How do you build a personalized feed for a user with no follow graph or engagement history?
+
+**Answer:** **Progressive personalization pipeline**: (1) **onboarding survey** — during signup, ask the user to select interests from a curated list (e.g., "Sports", "Technology", "Music"). Each interest maps to a list of suggested accounts to follow. This builds an initial follow graph of 20-30 accounts. (2) **interest-based feed** — for the first 3 days, the feed is generated from a **topic-based aggregation**: fetch the top posts from accounts classified under the user's selected interests. The ranking uses global popularity (likes/shares) adjusted by interest affinity. (3) **cold start model** — a separate ML model (logistic regression) for new users: features = selected interests, signup cohort, device type, time of day, location (country/city). Output = predicted CTR for each feed item category. This model is trained on the first 24-hour behavior of users from the same cohort. (4) **exploration vs exploitation** — allocate 30% of feed slots to **exploration**: show content from outside the user's stated interests. Track engagement with exploration items. After 7 days, the exploration rate drops to 5% (the user's taste is now known). (5) **warm-up feeds from social graph** — if the user signed up via a referral link, bootstrap their feed from the referrer's interests (collaborative filtering: "users who follow X also follow Y"). (6) **gradual personalization** — the feed transitions from 100% interest-based (day 1) to 80% interest + 20% engagement-based (day 3) to 50% interest + 50% engagement (day 7) to fully personalized (day 14). The transition is smooth — the engagement weight increases linearly with the number of user interactions logged. (7) **monitoring** — `cold_start_new_user_retention` (D1/D7 retention), `cold_start_time_to_first_engagement`, `cold_start_feed_diversity`. Target: cold start users should have similar D7 retention as existing users (within 5%).
+
+---
 

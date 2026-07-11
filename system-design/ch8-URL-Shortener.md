@@ -2,111 +2,41 @@
 
 ## Q1: When serving global redirects from a URL shortener, should you use an HTTP 301 Permanent Redirect or an HTTP 302 Found Redirect if you must capture comprehensive click analytics?
 
-**Options:**
-
-- HTTP 301, because browsers cache the redirect, reducing your egress network bandwidth costs drastically.
-- HTTP 302, because browsers will consistently hit your backend infrastructure for every click, allowing you to accurately track click counts and user agent metadata.
-- HTTP 301, because modern browsers append downstream analytical tracking tokens automatically to permanent redirect payloads.
-- HTTP 307, because it forces the browser to transition from a GET request to a POST request to deliver analytic cookies.
-
 **Answer:** HTTP 302, because browsers will consistently hit your backend infrastructure for every click, allowing you to accurately track click counts and user agent metadata.
 
 ## Q2: To scale reads for a viral short link that receives 500,000 requests per second globally, which caching eviction strategy is most appropriate for the distributed Redis layer handling the mapping metadata?
-
-**Options:**
-
-- FIFO (First In, First Out), to ensure stale links are purged strictly based on their creation sequence.
-- LRU (Least Recently Used) or LFU (Least Frequently Used), to guarantee that active, high-traffic URL mappings remain hot in memory while dead links naturally phase out.
-- Random Eviction, because it reduces the CPU overhead of keeping track of memory key access ordering structures.
-- TTL-only eviction with zero memory cap flags configured on the cluster nodes.
 
 **Answer:** LRU (Least Recently Used) or LFU (Least Frequently Used), to guarantee that active, high-traffic URL mappings remain hot in memory while dead links naturally phase out.
 
 ## Q3: If you utilize a NoSQL wide-column database like Apache Cassandra to store the short URL data, what should be designated as your Partition Key to achieve uniform data distribution across the ring cluster?
 
-**Options:**
-
-- The target 'long_url' string parameter, to group similar destinations onto identical storage physical nodes.
-- The generated 'short_code' token, because its distributed hashing ensures predictable, random, and uniform scattering across the cluster nodes.
-- The 'created_at' timestamp field, so that historical queries can scan adjacent rows consecutively.
-- The user ID of the link creator, ensuring that corporate accounts have isolated table storage spaces.
-
 **Answer:** The generated 'short_code' token, because its distributed hashing ensures predictable, random, and uniform scattering across the cluster nodes.
 
 ## Q4: A Cache Stampede (Thundering Herd) risk occurs when a viral short link's cache key expires, forcing thousands of concurrent app requests to compute or fetch the long URL from the database simultaneously. How do you mitigate this at Staff scale?
-
-**Options:**
-
-- Increase the database pool size to allow unlimited concurrent processing connections.
-- Implement probabilistic early expiration (XFetch) or use a mutex lock (single-flight pattern) so only one worker updates the cache while others wait or read old data.
-- Convert all database operations to run on synchronous serial read lines.
-- Configure the browser clients to run exponential backoff calculations on the client-side UI redirect tier.
 
 **Answer:** Implement probabilistic early expiration (XFetch) or use a mutex lock (single-flight pattern) so only one worker updates the cache while others wait or read old data.
 
 ## Q5: Why is Base62 encoding preferred over standard Hexadecimal (Base16) or Base64 encoding for generating public short links?
 
-**Options:**
-
-- Base62 offers more complex encryption parameters to defend against reverse engineering attacks.
-- Base62 significantly maximizes character density per bit compared to Base16, while avoiding confusing special characters (like '+' or '/') used in Base64 that can break URL path string parsing.
-- Base62 integrates directly with standard hardware register structures to accelerate indexing operations.
-- Base64 generation introduces a mandatory network round-trip delay to validate text character mappings.
-
 **Answer:** Base62 significantly maximizes character density per bit compared to Base16, while avoiding confusing special characters (like '+' or '/') used in Base64 that can break URL path string parsing.
 
 ## Q6: If your distributed URL shortener deployment must ensure that short code strings are never recycled or overwritten even if they remain dormant for years, which lifecycle parameter should be omitted?
-
-**Options:**
-
-- Enforcing an aggressive Time-To-Live (TTL) expiration configuration on primary database storage records.
-- Using consistent hashing to partition the core NoSQL wide-column table keyspaces.
-- Enforcing sliding rate limits on incoming API click ingestion proxy endpoints.
-- Configuring Bloom Filter bit masks inside the real-time cache cluster lines.
 
 **Answer:** Enforcing an aggressive Time-To-Live (TTL) expiration configuration on primary database storage records.
 
 ## Q7: When designing the database schema for a URL shortener in a relational SQL platform at scale, what optimization accelerates pointing lookups based on short code keys?
 
-**Options:**
-
-- Defining the short code field string layout as a unique clustered index on the database partition tables.
-- Inlining the raw long destination URL string into a single character binary cell array.
-- Dropping table primary keys entirely to speed up horizontal append velocities.
-- Enforcing synchronous distributed locks across alternate read replica configurations.
-
 **Answer:** Defining the short code field string layout as a unique clustered index on the database partition tables.
 
 ## Q8: What happens if a user submits a long URL destination containing malicious or phishing payload links to your platform's creation endpoint?
-
-**Options:**
-
-- The shortener gateway should pass the target URL through an asynchronous threat intelligence verification API filter before registering the short link in database layers.
-- The system should execute a hard container rebuild across the ingress proxy server pool.
-- The system automatically transitions all downstream database rows into binary layouts.
-- The endpoint blocks all inbound client traffic configurations permanently.
 
 **Answer:** The shortener gateway should pass the target URL through an asynchronous threat intelligence verification API filter before registering the short link in database layers.
 
 ## Q9: When scale-testing the short code generation component using a central relational sequence generator, what is the best strategy to maximize write path performance?
 
-**Options:**
-
-- Force each worker container to fetch a block or range of sequential ID numbers into local memory buffers at boot time, reducing point lookups.
-- Execute a full table vacuum loop synchronously on every single short link write action.
-- Convert the generation algorithm to rely strictly on raw UDP loopback protocols.
-- Purge the master database configuration parameters whenever traffic scales past baselines.
-
 **Answer:** Force each worker container to fetch a block or range of sequential ID numbers into local memory buffers at boot time, reducing point lookups.
 
 ## Q10: Why is it discouraged to use a simple MD5 or SHA-256 hash of a long URL string directly as its short code parameter value?
-
-**Options:**
-
-- Standard cryptographic hashing algorithms generate values that are too long (e.g., 32+ hex characters), violating short link requirements unless extra compression or truncation step logic is applied.
-- Cryptographic hashes lose their character validation properties if they traverse internet proxy routers.
-- Hashing long URLs forces relational database layers to discard primary key constraints.
-- Cryptographic hashing requires an outbound cross-network round-trip handshake loop.
 
 **Answer:** Standard cryptographic hashing algorithms generate values that are too long (e.g., 32+ hex characters), violating short link requirements unless extra compression or truncation step logic is applied.
 
@@ -151,4 +81,65 @@
 ## Q20: Your URL shortener platform is acquired by a larger company. The CTO demands a migration from your custom stack to the acquirer's existing URL shortener infrastructure. They have 50 billion existing links; you have 10 billion. Design the migration with zero downtime and zero broken links for both sets of users.
 
 **Answer:** **Unified routing layer** with a **read-through proxy**: (1) **proxy deployment** — deploy a new global routing layer (Nginx/Envoy) in front of both systems. The proxy holds no data — it's a smart redirector. (2) **mapping table** — for every incoming `GET /{short_code}`, the proxy checks: (a) Redis cache (pre-warmed with both systems' active links); (b) if cache miss, query an **orchestrator** that fans out to both systems in parallel: "does system A have this code?" + "does system B have this code?"; (c) if exactly one returns a result, respond with that redirect; (d) if both return, use the timestamp of last update (newer wins); (e) if neither, return 404. (3) **bulk import** — export all 10B links from your system as compressed Parquet files. Write a **parallel import job** (Spark, 2000 workers) that inserts into the acquirer's system with a flag `origin: "acquired"` and a `preferred` ranking (so the proxy prefers your system's data during the overlap period). (4) **consistent hash ring unification** — if the acquirer's system uses consistent hashing for sharding, allocate a new partition prefix for your data (e.g., all your codes start with a specific fingerprint bit pattern) to avoid reshuffling their existing data. (5) **cutover** — once all 10B links are imported and verified (checksum reconciliation, Merkle tree comparison), switch the proxy to query only the acquirer's system for both old and new links. Keep your old system running as read-only backup for 1 month. (6) **DNS cutover** — the short domain's DNS already points to the proxy, so no DNS change needed. The entire migration is transparent to end-users. (7) **rollback** — if the acquirer's system has higher latency or errors, flip the proxy back to dual-read mode. The proxy exposes a `system_a_traffic_share` feature flag (0-100%) for gradual rollback.
+
+
+## Q21: How do you handle custom alias conflicts when users request already-taken short codes? Design a conflict resolution strategy that maximizes user satisfaction without compromising security.
+
+**Answer:** **Multi-phase alias suggestion engine**: (1) **auto-suggest alternatives** — when a user requests a taken alias, run a **Levenshtein distance search** against the taken alias to suggest alternatives (e.g., `MyBrand` taken → suggest `MyBrand1`, `MyBrand_`, `MyBrandHQ`). (2) **phonetic variations** — use Soundex or Metaphone to find phonetically similar available aliases. (3) **prefix/suffix expansion** — suggest `the{requested}`, `{requested}official`, `go/{requested}`. (4) **reservation queue** — for premium aliases (brand names), allow users to **reserve** an alias that is currently taken but inactive (no clicks for 90 days). On reservation, the current owner gets a 30-day notice to reclaim; if no action, the alias is transferred. Security: (5) **squatter detection** — if an account registers >100 custom aliases without using them, flag as a squatter and release all their aliases to the pool. (6) **rate-limit alias creation** per account (e.g., 10 custom aliases/day for free tier, 100/day for paid). (7) **premium alias marketplace** — for high-demand aliases, implement a domain-style auction or fixed-price purchase, with proceeds going to anti-abuse operations.
+
+---
+
+## Q22: Design a URL redirection system that uses HTTP/2 server push to reduce redirect latency. How would you implement this and what browsers support it?
+
+**Answer:** HTTP/2 server push (deprecated in Chrome 106+, but the concept applies to **103 Early Hints** and **link preloads**). Modern approach: use **103 Early Hints**: when the client sends `GET /shortcode`, the server immediately responds with `HTTP 103 Early Hints` containing the `Link` header pointing to the target URL: `Link: <https://target.com/foo>; rel=preconnect; as=document`. The browser starts a pre-connection to the target domain while the server resolves the short code. Then the server sends the final `HTTP 302` redirect. This saves ~100-300ms of redirect latency (the TCP + TLS handshake to the target happens in parallel with short code resolution). Implementation: (1) the edge proxy (e.g., Cloudflare, Fastly) supports 103 Early Hints natively. (2) the short URL service must respond with 103 within 10ms (before the DB lookup completes). (3) pre-compute the target URL from the KV store and cache it in Redis — the 103 response reads from cache, not DB. (4) fallback: if 103 is not supported (Safari, older Chrome), it's silently ignored — the 302 works as normal. Alternative: use **HTTP/2 ORIGIN frame** to pre-connect to the target, but this is experimental. Currently, 103 Early Hints is supported by Chrome, Edge, and Opera — covering ~80% of desktop users. For mobile, fall back to standard 302.
+
+---
+
+## Q23: How do you handle QR code generation at scale (millions of QR codes per day) for short URLs? How do you cache, serve, and monitor QR generation?
+
+**Answer:** **Pre-generation with CDN caching**: (1) when a short URL is created, trigger an async job to generate the QR code for that URL. Generate at **multiple sizes** (e.g., 256×256, 512×512, 1024×1024) and **multiple formats** (PNG, SVG, WebP). Store in object storage (S3) with key `qr/{short_code}/{size}.{format}`. (2) **CDN cache** — serve QR images via CDN with `Cache-Control: public, max-age=31536000, immutable`. The short code is immutable (once created, the target URL never changes for that code), so the QR cache is permanent. (3) **on-the-fly generation** — if a QR is requested but not pre-generated (rare), generate synchronously in <50ms using a lightweight lib (e.g., `go-qrcode` or `qr.js`). Cache the result to S3 asynchronously. (4) **error correction level** — use Level M (15% error correction) for most use cases; Level H (30%) for QR codes printed on curved surfaces (mugs, t-shirts). (5) **monitoring** — `qr_generation_count`, `qr_cache_hit_ratio`, `qr_size_on_disk`. If cache hit ratio drops below 90%, pre-generation may have fallen behind. (6) **abuse prevention** — QR codes can be used for phishing. Implement **dynamic QR overlays**: when serving the QR image, add a human-readable label at the top: "URL: https://short.domain/abc" — this lets the user verify the destination before scanning.
+
+---
+
+## Q24: Design link expiration and recycling for a URL shortener. How do you safely recycle short codes without breaking existing references?
+
+**Answer:** **Soft recycling with grace period**: (1) **expiration** — when a short link reaches its TTL, the mapping is soft-deleted (marked `expired` but not removed). Any request returns a "This link has expired" page (410 Gone) rather than a redirect. (2) **re-request** — the link creator receives an email: "Your short link has expired. Click here to renew for another 30 days." If renewed, the link returns to active state. (3) **recycling** — after a **grace period** (e.g., 180 days after expiration), the short code enters the **recycling pool**. The mapping is deleted from the primary database. A record of the original mapping is kept in a separate **archive table** (S3 + DynamoDB) for forensic purposes. (4) **code reclamation** — before reassigning a recycled code, the system checks: (a) is the code in the recycled pool? (b) has the recycle period elapsed? (c) does the new mapping have a different target domain? (d) is there any pending "I want this back" request from the original owner? If all checks pass, the code is assigned to the new URL. (5) **safety** — never recycle codes from accounts with compliance requirements (enterprise, healthcare, finance). (6) **alternative** — instead of recycling, **expand the key space**: go from 7-char to 8-char codes to add 57× more capacity (`62^8 / 62^7 = 62`). This avoids the complexity of recycling entirely.
+
+---
+
+## Q25: Design a click analytics pipeline that supports real-time per-link counts (sub-second) and accurate historical reporting (multi-year). How do you handle counting at 500K clicks/sec?
+
+**Answer:** **Lambda architecture with Kafka + Druid/ClickHouse**: (1) **speed layer** — each click event is published to Kafka. A stream processor (Flink) computes per-link click counts in 1-second sliding windows and writes to Redis: `HINCRBY clicks:{short_code}:realtime 1`. This gives sub-second visibility. (2) **batch layer** — the same Kafka events are sunk to a columnar store (ClickHouse or Druid) using a 5-minute flush. ClickHouse uses a `ReplacingMergeTree` table with `(short_code, timestamp, user_agent, geo, referrer)` columns. Historical queries run on ClickHouse with sub-second response for filtered multi-dimensional queries. (3) **counting accuracy** — deduplicate clicks by `(short_code + client_ip + user_agent + timestamp_minute)`. Store the dedup key in a Redis Bloom filter per short_code (24-hour window). This prevents accidental double-counting from page refreshes or bot retries. (4) **hot shards** — a viral link receiving 500K clicks/sec will hot-shard a single Kafka partition. Use a **two-level partitioning**: first partition by `short_code_hash % N` (where N is tuned to ensure even distribution), then within each partition, sub-partition by `(short_code, timestamp_bucket)`. Flink handles this with keyed streams. (5) **sampling for long-tail** — for non-viral links (<1K clicks/day), sample at 10% rate and extrapolate. This reduces storage cost by 90% for low-traffic links. (6) **monitoring** — `click_ingestion_lag` (time from click to visible in dashboard). Target <5 seconds for real-time, <5 minutes for historical.
+
+---
+
+## Q26: How do you filter bot traffic from click analytics without blocking legitimate crawlers and link previewers?
+
+**Answer:** **Multi-signal bot detection pipeline**: (1) **user-agent classification** — maintain a blocklist of known bot user-agents (Googlebot, Bingbot, etc.). These are logged separately (crawler clicks) but excluded from analytics. (2) **behavioral signals** — analyze click patterns: (a) zero JavaScript execution (headless browsers often lack JS); (b) missing `Accept-Language` header; (c) clicks within <100ms of page load (bots don't read); (d) high click velocity from a single IP (/24 subnet). (3) **ML classifier** — a lightweight random forest model trained on features: `avg_clicks_per_second`, `user_agent_entropy`, `JS_capable`, `screen_resolution_present`, `mouse_move_events` (captured via a 1px tracking pixel). Score the click event in real-time (under 1ms using ONNX runtime). If bot probability > 0.8, exclude from analytics. (4) **CAPTCHA escalation** — if the ML classifier is uncertain (0.4-0.8 probability), issue a CAPTCHA challenge on the redirect page before proceeding. This adds 500ms to the redirect but ensures human-only counting for borderline cases. (5) **link preview exemptions** — social platforms (Facebook, Twitter, Slack, Discord) send headless browser requests to generate link previews. Maintain a **preview bot allowlist** by IP range and user-agent pattern. These requests are counted separately (as "impressions") and excluded from click analytics. (6) **audit trail** — log every click with its bot score. Review weekly: what percentage of clicks were classified as bots? If bot_rate > 50% for a link, investigate abuse.
+
+---
+
+## Q27: Design an abuse detection system for a URL shortener that detects phishing, malware, and spam links at creation time and during their lifecycle.
+
+**Answer:** **Real-time + periodic scanning**: (1) **creation-time checks**: (a) **domain reputation lookup** — check the target domain against Google Safe Browsing API, PhishTank, and a local reputation database. (b) **URL pattern analysis** — regex patterns for common phishing patterns: `login`, `secure`, `account`, `verify` in suspicious domains, IP-based URLs, and excessive subdomains. (c) **content fingerprinting** — download the target page's content and hash it. Compare against a database of known phishing page hashes (semantic similarity using SimHash). (2) **lifecycle monitoring**: (a) **click anomaly detection** — if a normally dormant link suddenly receives 1000× clicks in an hour, flag as potentially compromised (phishing campaign started). (b) **target mutation** — monitor the target URL for changes. If a redirected page's content changes from legitimate to suspicious, flag the link. (c) **user reports** — add a "Report abuse" button on the redirect page. Handle reports in a moderation queue within 1 hour. (3) **automated takedown** — if abuse probability > 0.95, automatically disable the link and redirect to a warning page. Notify the link creator. False positive rate target: <0.1% (one in a thousand legitimate links disabled incorrectly). (4) **appeal process** — when a link is disabled, the creator can appeal by verifying ownership (e.g., clicking a verification link in the original creation email). If the appeal is legitimate, restore within 1 hour. (5) **monitoring** — `abuse_detection_precision` (correct takedowns / total takedowns) and `abuse_detection_recall` (correct takedowns / total abusive links). Target both >95%.
+
+---
+
+## Q28: How do you optimize short URL redirect latency for users across the globe? Design a multi-region redirect architecture with sub-10ms p99 response time.
+
+**Answer:** **Edge-first architecture**: (1) **global edge deployment** — deploy the redirect service on a CDN with edge compute (Cloudflare Workers, Fastly Compute@Edge, or AWS Lambda@Edge). The edge node holds a local cache of the `short_code → target_url` mapping in a **distributed KV store** (e.g., Cloudflare KV, Redis Global Datastore, or DynamoDB Global Tables). (2) **cache hierarchy**: (a) **L1: local memory cache** on the edge node (LRU, 1M entries, ~50ms TTL for stale revalidation). Serves >95% of requests from memory (<1ms). (b) **L2: regional Redis cluster** — if L1 misses, query the nearest regional Redis (3-5ms). (c) **L3: global database** — if both miss, query the primary database (DynamoDB Global Tables or Cassandra with multi-region replication). (<20ms). (3) **write path** — when a short URL is created, the mapping is written to the primary database. A **multi-region invalidation** event is published to a global Kafka topic. Each region's cache worker consumes the invalidation and updates the L2/L1 caches. (4) **proactive replication** — for premium customers, use **synchronous cross-region write** (DynamoDB Global Tables with 1-second replication) so that a link created in us-east-1 is available in eu-west-1 within 1 second. (5) **anycast DNS** — use a single IP address announced from all edge locations. BGP anycast routes users to the nearest edge node, minimizing network hops. (6) **monitoring** — `redirect_p50/p99/p999_latency` per region. Target: p50 < 1ms, p99 < 10ms globally. Alert if any region's p99 exceeds 20ms.
+
+---
+
+## Q29: Design a URL preview system (Open Graph / link previews) that generates rich card previews (title, description, image) for shared links without leaking user identity to the target site.
+
+**Answer:** **Proxy-based preview generation**: (1) **preview cache** — when a short URL is created, enqueue a background job to fetch the target page's Open Graph meta tags. Parse `<meta property="og:title">`, `<meta property="og:description">`, `<meta property="og:image">`, etc. Store the parsed preview data in a KV store (Redis or DynamoDB) with key `preview:{short_code}` and TTL of 7 days (content may change). (2) **image proxy** — OG images are fetched via a **proxy service** (`/preview-image/{short_code}`). The proxy fetches the OG image URL, caches it in object storage, and serves it with proper caching headers. This prevents the target site from seeing the referrer or client IP (privacy). (3) **on-demand regeneration** — if a user requests a preview for a short code that hasn't been processed yet (within the first 5 seconds), generate the preview synchronously (fetch + parse + cache, <500ms). The response includes the preview data inline (JSON) for the social platform to render. (4) **fault tolerance** — if the target site is slow (>2s to respond) or returns errors, serve a degraded preview (just the domain name and the URL). Cache the failure to avoid re-fetching. (5) **attack surface** — OG images can be used for tracking. Strip tracking pixels and query params from OG image URLs before caching. Sanitize OG titles/descriptions for XSS (HTML-encode all values). (6) **monitoring** — `preview_cache_hit_ratio` (target >95%), `preview_generation_latency_p99` (target <500ms), `og_image_proxy_bytes_saved` (how much bandwidth the proxy saved by caching).
+
+---
+
+## Q30: Compare base62, base64, and hashids encoding for short URL generation. What are the trade-offs in collision probability, character set, and reversibility?
+
+**Answer:** (1) **Base62 (0-9, a-z, A-Z)** — the standard. 62^7 ≈ 3.5 trillion unique codes for 7 chars. No collision at any reasonable scale. URL-safe (no special characters). Case-sensitive (potential for confusion: `a` vs `A`). Simple, fast, reversible (you can decode a base62 string back to an integer). **Best for general-purpose short URLs**. (2) **Base64 (A-Z, a-z, 0-9, +, /)** — 64^7 ≈ 4.4 trillion codes. The `+` and `/` characters are not URL-safe and must be URL-encoded (`%2B`, `%2F`), increasing code length by 50% in URLs. Some implementations use **URL-safe base64** (replace `+` with `-` and `/` with `_`). 64^7 = 4.4×10^12, offering ~27% more codes than base62 for the same length. But the `-` and `_` can cause issues in domain names and file systems. **Not recommended for short URLs**. (3) **Hashids** — encodes integers into a string using a configurable salt and alphabet. Produces variable-length output. **Not cryptographically secure** — the encoding is reversible without the salt (known attacks against hashids). Collisions: hashids does not produce collisions for the same salt and minimum length, but different salts may collide. **Should not be used for short URLs where security is a concern**. Comparison: base62 is the clear winner for short URLs — URL-safe, no collisions, reversible (for analytics/debugging), and widely adopted (bit.ly, TinyURL). Hashids adds no meaningful security. Base64 offers marginal code density at the cost of URL-unfriendly characters. Production recommendation: use base62 for auto-generated codes, with a random salt to avoid sequential guessing if needed (though base62 alone does not prevent enumeration — use FPE for security, not encoding choice).
+
+---
 

@@ -2,111 +2,41 @@
 
 ## Q1: When scale testing stateful WebSocket Gateways to handle 10 million concurrent active user connections, what operating system resource bottleneck is typically encountered first on an individual server node before CPU exhaustion occurs?
 
-**Options:**
-
-- Disk I/O write throughput capacity limits.
-- The maximum file descriptor availability limit (C10K/C10M problem) along with kernel memory allocations for socket read/write buffers.
-- The local hardware register width bounds.
-- DNS resolution throughput limits on the loopback adapter interface.
-
 **Answer:** The maximum file descriptor availability limit (C10K/C10M problem) along with kernel memory allocations for socket read/write buffers.
 
 ## Q2: If your chat application uses an active cluster of stateful WebSocket servers, what structural downside occurs if you use a standard Round-Robin Load Balancer without session awareness to distribute fresh socket requests?
-
-**Options:**
-
-- The load balancer automatically converts outbound packet frames into legacy FTP routes.
-- Connections distribute uniformly at first, but because sessions are long-lived, server groups can exhibit severe load imbalances over time as users disconnect unevenly.
-- The data formatting layer automatically switches to use raw Base16 hex coding blocks.
-- Relational query optimizations become invalid across downstream database replica nodes.
 
 **Answer:** Connections distribute uniformly at first, but because sessions are long-lived, server groups can exhibit severe load imbalances over time as users disconnect unevenly.
 
 ## Q3: To track a user's real-time online/offline presence status across millions of users, why is using a distributed key-value store with continuous HTTP short-polling heavily discouraged?
 
-**Options:**
-
-- Key-value stores cannot serialize basic character strings efficiently.
-- The sheer volume of continuous read queries from millions of clients polling status fields will overwhelm the database clusters, introducing high infrastructure costs and severe read contention.
-- Short-polling automatically triggers dynamic table schema rewrites across the storage layer.
-- It forces data centers to drop multi-region replication settings to prevent corruption.
-
 **Answer:** The sheer volume of continuous read queries from millions of clients polling status fields will overwhelm the database clusters, introducing high infrastructure costs and severe read contention.
 
 ## Q4: When storing chat history messages, why is a wide-column NoSQL database like Apache Cassandra or ScyllaDB often chosen over a traditional relational database model like MySQL at scale?
-
-**Options:**
-
-- Relational systems are unable to manage primary key index models over large datasets.
-- Wide-column stores optimize for append-heavy write paths and support linear range scans based on a partition key (chat_id) and clustering column (message_id), matching chat access patterns cleanly.
-- Cassandra automatically translates plain text payloads into encrypted bit vectors across the storage nodes.
-- NoSQL architectures eliminate the requirement for implementing application rate-limit boundaries.
 
 **Answer:** Wide-column stores optimize for append-heavy write paths and support linear range scans based on a partition key (chat_id) and clustering column (message_id), matching chat access patterns cleanly.
 
 ## Q5: In a group chat with 10,000 active participants, a user publishes a message, triggering a 'Fan-Out' write/distribution operation. How do you prevent this single message event from stalling the processing pipeline of the stateful gateway server?
 
-**Options:**
-
-- Force the sender node to block and wait until 10,000 synchronous network confirmations are logged sequentially.
-- Publish the message event to an asynchronous message broker (e.g., Kafka or Pulsar) and let distributed consumer workers process fan-out distribution out-of-band, routing payloads to targets via an internal session map.
-- Convert the message payload to a compressed binary format and broadcast it over local UDP loopback paths uniformly.
-- Instantly disconnect all 10,000 participants to clear out active socket buffer queues.
-
 **Answer:** Publish the message event to an asynchronous message broker (e.g., Kafka or Pulsar) and let distributed consumer workers process fan-out distribution out-of-band, routing payloads to targets via an internal session map.
 
 ## Q6: When a client device reconnects after a prolonged network drop, how should the system catch it up on missed chat history efficiently without overloading the database?
-
-**Options:**
-
-- Re-execute a complete full-table scan across the entire historical message database for all chats in system history.
-- The client passes its last known, locally saved checkpoint sequence key or timestamp, allowing the message service to perform a highly bounded, indexed range query to fetch only the delta missing from that specific offset.
-- Force the client to dump its local cache entirely and rebuild all history records dynamically using random string guesses.
-- The server routes the full uncompressed data history cache over a slow single-threaded serial connection bus.
 
 **Answer:** The client passes its last known, locally saved checkpoint sequence key or timestamp, allowing the message service to perform a highly bounded, indexed range query to fetch only the delta missing from that specific offset.
 
 ## Q7: What core performance flaw exists if you rely on a centralized relational database's standard auto-incrementing integer key to sequence message order across thousands of independent distributed chat rooms?
 
-**Options:**
-
-- Relational systems cannot store integer formats inside partitioned tables cleanly.
-- The single auto-incrementing counter sequence creates a massive global write lock bottleneck across the database cluster, killing horizontal write scalability.
-- It forces all data packet headers to expand past the standard MTU payload boundaries.
-- It forces all downstream caching nodes to clear their entire memory contents every millisecond.
-
 **Answer:** The single auto-incrementing counter sequence creates a massive global write lock bottleneck across the database cluster, killing horizontal write scalability.
 
 ## Q8: How does implementing an internal 'Session Registry' using a distributed hash ring or consistent hashing protect stateful chat gateway nodes during an unexpected node crash?
-
-**Options:**
-
-- It converts all existing active WebSockets into raw UDP frames automatically.
-- It minimizes the impact of node reshuffling, ensuring that only the sessions directly connected to the crashed node must reconnect and re-map their states, leaving the remaining cluster stable.
-- It guarantees that database writes skip index operations to save storage spaces.
-- It forces client applications to execute complete hard factory resets.
 
 **Answer:** It minimizes the impact of node reshuffling, ensuring that only the sessions directly connected to the crashed node must reconnect and re-map their states, leaving the remaining cluster stable.
 
 ## Q9: To track whether a message has been successfully Read by a recipient without introducing a write amplification storm in your database, how should Read Receipts be handled at scale?
 
-**Options:**
-
-- Execute an immediate synchronous row update operation in the database for every single individual message read event.
-- Batch read receipt events in memory at the client or gateway layer, and update a single 'last_read_message_id' checkpoint watermark per user session in the database asynchronously.
-- Route all read status strings into an alternative local text log directory on the gateway host machine.
-- Drop read receipt events completely if concurrent chat room traffic surges past a baseline threshold.
-
 **Answer:** Batch read receipt events in memory at the client or gateway layer, and update a single 'last_read_message_id' checkpoint watermark per user session in the database asynchronously.
 
 ## Q10: What is the role of an internal 'Heartbeat' mechanism between a client app and the stateful WebSocket gateway node?
-
-**Options:**
-
-- It forces the application to clear out its local device storage schemas periodically.
-- It allows the server to detect dead client connections (zombie connections) caused by silent half-open network drops, enabling the system to reclaim server memory and update user presence accurately.
-- It re-encrypts historical message payloads inside the downstream NoSQL column families.
-- It synchronizes the absolute physical timezone configuration settings across the router interfaces.
 
 **Answer:** It allows the server to detect dead client connections (zombie connections) caused by silent half-open network drops, enabling the system to reclaim server memory and update user presence accurately.
 
@@ -151,4 +81,65 @@
 ## Q20: Your chat platform is acquired by a company that uses a completely different protocol (Matrix instead of your proprietary protocol). They demand interoperability — users from either system must be able to message each other seamlessly. Design a federation bridge that handles identity mapping, protocol translation, and end-to-end encryption compatibility.
 
 **Answer:** **Bidirectional federation bridge**: (1) **protocol translator** — deploy a bridge service that connects to both systems as a regular client. For your proprietary protocol → Matrix: the bridge logs into a Matrix account (e.g., `@bridge:yourdomain.com`), creates Matrix rooms mirroring your conversations, and relays messages. For Matrix → your protocol: the bridge opens a WebSocket connection to your gateway on behalf of the Matrix user. (2) **identity mapping** — maintain a `user_id → matrix_id` mapping in a consistent KV store (DynamoDB). When a user from your system sends a message to a Matrix user, the bridge looks up the Matrix user's ID, creates a portal room (if not exists), and relays the message with the sender's display name mapped. (3) **E2EE compatibility** — this is the hardest part. If your system uses E2EE and Matrix uses Olm/Megolm (double ratchet), the bridge must be an **E2EE termination point** — it decrypts from one side and re-encrypts for the other. This means the bridge sees plaintext (known as "trusted bridge" model). For higher security, use **transparent relay**: the bridge does not decrypt; instead, it passes the encrypted payload as an attachment in the Matrix room, and a custom Matrix client plugin decrypts it using the original keys. This requires both parties to use a shared key exchange mechanism (e.g., a QR code scanned at pairing time). (4) **presence sync** — the bridge subscribes to presence events from both systems and relays them (online/offline/last_seen). (5) **rate limiting** — the bridge enforces per-user rate limits to prevent a flood from one system overwhelming the other. (6) **monitoring** — track `bridged_messages_per_minute`, `bridge_latency_p99`, and `bridge_failure_rate`. Alert if >1% of bridged messages fail to deliver. (7) **graceful degradation** — if the bridge is overloaded, queue messages and deliver them later (best-effort). Never drop messages. The bridge exposes health endpoints for both systems' monitoring.
+
+
+## Q21: Design an end-to-end encryption key management system for a chat app following the Signal protocol. How do you handle key rotation, pre-key bundles, and lost device recovery?
+
+**Answer:** **Signal protocol key management**: (1) **key types**: (a) **identity key** (IK) — long-term Curve25519 key pair, generated once per device. (b) **signed pre-key** (SPK) — medium-term key pair, signed by IK, rotated every 7 days. (c) **one-time pre-keys** (OTPK) — short-term key pairs, uploaded to the server in batches of 100. Used once and deleted. (2) **key storage** — the server stores pre-key bundles per device: `{identity_key_public, signed_pre_key_public, signed_pre_key_signature, one_time_pre_keys[{key_id, public_key}]}`. The server never stores private keys. (3) **session establishment** — when Alice wants to message Bob: (a) Alice fetches Bob's pre-key bundle from the server. (b) Alice generates an ephemeral key and performs X3DH (Extended Triple Diffie-Hellman) to derive a shared secret. (c) Alice sends the first message with her identity key, ephemeral key, and which one-time pre-key she used. (d) Bob receives the message, performs X3DH on his side, and derives the same shared secret. (4) **key rotation** — after each message, the session key is ratcheted forward (Double Ratchet algorithm). The symmetric ratchet updates the sending/receiving chain keys. The asymmetric ratchet (DH ratchet) updates the root key every N messages (default 1000). (5) **lost device recovery** — if a user loses their device: (a) they reinstall the app and generate new identity keys. (b) old messages encrypted with the old keys are **permanently lost** (forward secrecy). (c) other users see a safety number change notification ("Alice's security code has changed"). (d) new sessions are established with the new keys. **No cloud backup of private keys** — this is by design (zero-knowledge). (6) **monitoring** — `pre_key_upload_success_rate`, `pre_key_low_count_alert` (if a device has <10 one-time pre-keys remaining, trigger upload of new batch), `session_establishment_latency`.
+
+---
+
+## Q22: How do you guarantee message ordering across multiple devices for the same user? When a user sends from their phone and then their laptop, how do both devices and recipients see the same order?
+
+**Answer:** **Centralized sequencer per conversation**: (1) each conversation (1:1 or group) has a **sequence number** assigned by a sequencer (a Raft-based service or a dedicated partition in a distributed log like Kafka). The sequencer assigns monotonically increasing sequence numbers to messages within the conversation. (2) **per-device commit**: when a device sends a message, it first requests a sequence number from the sequencer. The message is published to the conversation's log with that sequence number. All devices (sender's other devices + recipients) consume the log and render messages in sequence order. (3) **offline writes**: if a device is offline, it assigns itself a **local sequence number** (negative, from a decreasing counter). When it comes online, the server assigns a real sequence number and inserts the message at the correct position. Other devices see it in the position determined by the real sequence number (not the local one). (4) **cross-device sync**: after sending, the sending device broadcasts the message to the user's other devices via the server (not peer-to-peer). The server forwards with the assigned sequence number. All devices render in the same order. (5) **conflict resolution**: if two devices send concurrently while offline, two different absolute sequence numbers are assigned when they come online. The server orders by `(online_time, device_priority)`. If they truly conflict (same parent message), both are shown in sequence order (whoever's server commit happened first wins the ordering). (6) **monitoring** — `ordering_violation_count` (messages rendered out of sequence order — target zero), `sequencer_latency_p99` (<10ms target).
+
+---
+
+## Q23: Design a typing indicator system that works at million-user scale. How do you broadcast "User is typing..." to a group chat of 10,000 participants without flooding the network?
+
+**Answer:** **Throttled typing indicator with selective broadcast**: (1) **client-side throttling** — the client sends a `typing_start` event when the user starts typing, and a `typing_stop` event after 3 seconds of no input. The client also sends `typing_update` events every 5 seconds while continuously typing (to prevent timeout). (2) **server-side throttling** — the server deduplicates typing events: if a `typing_start` event from user X was already processed within the last 3 seconds, ignore the new one. (3) **selective broadcast** — for group chats: (a) if group size < 100, broadcast the typing indicator to all members. (b) if group size 100-1000, broadcast to the last 50 active members (by recent message activity). (c) if group size > 1000, do NOT broadcast typing indicators — they are disabled for large groups. Instead, show "Several people are typing" (count of active typers, updated every 10 seconds). (4) **protocol**: use a dedicated Kafka topic `typing_indicators` partitioned by `conversation_id`. Consumers on the WebSocket gateway nodes receive the event and push to the relevant connections. (5) **privacy**: typing indicators are a soft-state feature — they are not persisted to the database. If the server restarts, all typing indicators are lost (acceptable). (6) **monitoring** — `typing_events_per_second`, `typing_indicator_latency_p50` (from user keystroke → other users seeing indicator — target <200ms).
+
+---
+
+## Q24: Design read receipts that balance consistency (accurate "seen" state) with performance (not writing to the database for every single message view).
+
+**Answer:** **Watermark-based read receipts**: (1) **per-user per-conversation watermark** — each user has a `last_read_message_id` per conversation. When the user opens a conversation, the client sends the highest `message_id` they've seen. The server stores this as a single value per (user, conversation). (2) **batch update** — the client does NOT send a read receipt for each individual message. Instead, the client sends a **read watermark update** when: (a) the user opens the conversation (sets watermark to the latest message), (b) the user scrolls down (updates the watermark to the newest visible message), (c) after 5 seconds of idle scrolling (debounced). (3) **read-by display**: when another user views a read receipt for a specific message (e.g., "Seen by Alice"), the server checks: if `Alice.last_read_message_id >= target_message_id`, show the indicator. This is a single Redis GET — no DB write per message. (4) **privacy**: allow users to disable read receipts globally or per-conversation. When disabled, the watermark is never updated (always 0). (5) **large group optimization**: for groups > 100 members, do not show per-member read receipts. Show only a count ("Seen by 47 people"). The server tracks the count via atomic increment: `INCR conversation:{id}:read_count` when a watermark advances. (6) **monitoring** — `read_receipt_update_rate` (writes/second), `read_receipt_query_latency` (<1ms target). If write rate exceeds threshold, increase the batch window (5s → 10s).
+
+---
+
+## Q25: Design a "delete for everyone" feature that removes messages from all recipients' devices within 5 seconds. How do you handle offline recipients?
+
+**Answer:** **Delete with remote message revocation**: (1) **protocol**: when user A deletes a message, the client sends a `MessageDelete` event with `(message_id, conversation_id, delete_timestamp)`. (2) **online recipients**: the server pushes the delete event to all connected clients via the WebSocket connection within 500ms. The client removes the message from the local UI and marks it as deleted in the local database. (3) **offline recipients**: when an offline user comes online, the server sends a **deletion batch** — all pending delete events since the user's last connection. The client applies them in sequence order before showing any new messages. (4) **server-side enforcement**: the server also deletes the message from the database (soft-delete: sets `deleted_at` timestamp). Future sync requests from any device exclude soft-deleted messages. (5) **time limit**: "Delete for everyone" is only available within 1 hour of sending (per WhatsApp's model). After 1 hour, only "delete for me" (local deletion) is allowed. This prevents abuse (someone could delete a critical message after the fact). (6) **E2EE consideration**: with end-to-end encryption, the server cannot decrypt messages. For "delete for everyone", the server sends a delete command (which clients honor). The actual message content was already delivered and stored encrypted on the client. The delete command tells the client to delete the locally stored ciphertext. This relies on client compliance — a malicious client could refuse to delete. (7) **monitoring** — `delete_for_everyone_rate`, `delete_latency_p99` (time from delete request to >99% of online recipients processing it). Target <5 seconds for online, <60 seconds for offline (when they next connect).
+
+---
+
+## Q26: How do you optimize large group chat (10,000+ members) fan-out for message delivery? Compare per-member fan-out vs multicast vs hierarchical fan-out.
+
+**Answer:** **Three fan-out strategies**: (1) **per-member fan-out** (direct delivery) — the server sends the message individually to each online member via their WebSocket connection. For 10K members: 10K writes to the session map, 10K WebSocket sends. Cost: O(N) per message. Feasible only for groups <1000. (2) **multicast fan-out** — the server publishes the message to a Redis PubSub channel `group:{id}`. All WebSocket gateway nodes subscribe to this channel. When a message is published, all nodes receive it simultaneously and fan-out to their locally connected clients. Cost: O(N) still, but the server does not need to look up individual sessions — the fan-out is distributed across gateway nodes. Scans: for 10K members on 100 nodes → each node sends to ~100 clients. (3) **hierarchical fan-out** — for groups >10K, use a **sub-group hierarchy**: divide the group into sub-groups of 1000 members each. Each sub-group has a **leader node** that receives the message and fans it out to its members. Leaders are organized in a tree: root leader (receives from server) → 10 sub-leaders → each manages 1000 members. Cost: O(log N) server-side writes (10 writes to sub-leaders, each leader writes to 1000 members). (4) **progressive delivery**: (a) deliver to online members first (within 1 second). (b) batch delivery to push notification service for offline members (every 30 seconds). (c) on member reconnect, deliver missed messages via a catch-up sync. (5) **recommendation**: for groups <1000: per-member fan-out. For groups 1000-10000: multicast fan-out over Redis PubSub. For 10000+: hierarchical fan-out with progressive delivery.
+
+---
+
+## Q27: Design an attachment upload system with progress reporting, client-side compression, and server-side virus scanning at chat scale.
+
+**Answer:** **Presigned upload with chunked transfer**: (1) **presigned URL** — the client requests an upload URL from the server. The server generates a presigned S3 URL (or Azure Blob SAS) with a 15-minute expiry, keyed by `uploads/{user_id}/{message_id}/{chunk_index}`. (2) **client-side compression** — before uploading, the client compresses images (WebP/JPEG at 85% quality, max 2048px on the longest side) and videos (H.264, 720p, 2Mbps). Audio is compressed to Opus at 32kbps. This reduces upload size by 80-90% on average. (3) **chunked upload** — large files (>10MB) are split into 5MB chunks. Each chunk is uploaded with a parallel HTTP PUT request. The client tracks progress = `completed_chunks / total_chunks × 100%`. The progress is reported to the server (and other users) via a WebSocket message. (4) **server-side virus scanning** — after all chunks are uploaded, the server enqueues a scanning job (ClamAV or a commercial scanner like McAfee). The scan runs asynchronously. If malware is detected, the file is deleted and the sender is notified. (5) **attachment metadata** — once uploaded, the server stores metadata: `{file_url, thumbnail_url, file_size, mime_type, duration (for audio/video), width/height (for images)}`. The metadata is included in the chat message. (6) **thumbnail generation** — for images, the server generates thumbnails (256×256) via a lambda/SQS queue. For videos, extract a frame at 1-second mark as the thumbnail. (7) **monitoring** — `upload_success_rate`, `upload_latency_p99` (from upload start → ready for download), `virus_scan_rate`, `compression_ratio`. Target: >99% upload success, <30 seconds for 100MB files.
+
+---
+
+## Q28: Design a message search system using Elasticsearch. How do you index billions of messages and return results with sub-second latency?
+
+**Answer:** **Time-based index with routing**: (1) **index strategy**: use **time-based indices** (e.g., `messages-2026-01`, `messages-2026-02`). Each index is sharded by `conversation_id` (routing parameter). This ensures all messages from a conversation are in the same shard, enabling efficient `conversation_id` filters. (2) **mapping**: `{conversation_id (keyword), sender_id (keyword), timestamp (date), text (text with analyzer), attachments (nested), mentions (keyword array)}`. Use a `standard` analyzer for English, `icu_analyzer` for CJK, and `arabic` analyzer for Arabic. (3) **write path**: messages are indexed asynchronously via Kafka → Logstash/Filebeat → Elasticsearch. Target indexing latency: <5 seconds (near-real-time). Use `refresh_interval=30s` on the index to reduce indexing overhead. (4) **query path**: (a) filter by `conversation_id` (mandatory — prevents cross-conversation leakage). (b) full-text search on `text` field. (c) filter by `sender_id`, date range, attachment type. (d) sort by `timestamp` descending. (5) **performance**: for 100B messages → ~100TB of index data. Shard count: 500 shards × 200GB each across 25 ES data nodes (32GB RAM each). Query latency: p50 < 50ms, p99 < 500ms for full-text search within a conversation. (6) **hot/warm architecture**: recent indices (last 30 days) on hot nodes (SSD). Older indices on warm nodes (HDD). After 1 year, close old indices (they consume disk but not memory). (7) **monitoring** — `es_query_latency_p50/p99`, `es_indexing_lag` (time from message creation to indexed), `es_disk_usage`. Alert on yellow/red cluster health.
+
+---
+
+## Q29: Design a chat history retention policy that complies with GDPR (delete after 30 days if user requests) and enterprise compliance (retain for 7 years). How do you reconcile conflicting requirements?
+
+**Answer:** **Tagged retention with legal hold**: (1) **per-user retention tag** — each user has a `retention_policy` field: `standard` (30 days), `enterprise` (7 years), `legal_hold` (indefinite, only set by compliance team). (2) **tiered storage**: (a) **hot storage** (Cassandra/DynamoDB): messages from all users for the last 30 days. (b) **warm storage** (compressed Parquet in S3): messages older than 30 days for enterprise users only. (c) **cold storage** (Glacier): messages older than 1 year for enterprise users. (3) **purging**: a daily background job scans the `retention_policy` table. For users with `standard` policy: delete all messages older than 30 days from hot storage. For GDPR deletion request: mark the user's retention policy as `gdpr_deleted`, then purge all messages from all tiers within 72 hours. (4) **enterprise retention**: for enterprise users, messages are backed up to S3 with WORM (Write Once Read Many) lock. The lock policy prevents deletion for 7 years. Even if the user requests deletion, the messages are `suppressed` (removed from the queryable database) but physically retained in the locked S3 bucket. (5) **search indexing**: ES indices follow the same retention policy: standard users' index entries are deleted after 30 days via ILM (Index Lifecycle Management). Enterprise users' entries are moved to warm/cold ES nodes. (6) **audit**: the retention and deletion process is logged to an immutable audit store. A quarterly report confirms: (a) all GDPR-deleted user data has been purged. (b) all enterprise data under legal hold is intact. (c) no retention policy violations occurred. (7) **monitoring** — `data_purge_latency`, `retention_policy_violation_count` (messages older than the retention period still in hot storage — target zero).
+
+---
+
+## Q30: Design a Matrix federation protocol bridge for interoperability between your proprietary chat system and an open federated network. How do you handle room state, presence, and E2EE across federated servers?
+
+**Answer:** **Matrix federation bridge**: (1) **bridge architecture**: deploy a **Matrix Application Service (AS)** that connects to your proprietary chat server. The AS registers with a Matrix homeserver, receives Matrix events, and translates them to your protocol (and vice versa). (2) **room state bridging**: (a) when a Matrix user joins a bridged room, the AS creates a corresponding conversation in your system (or maps to an existing one). (b) room metadata (name, topic, avatar) is kept in sync bidirectionally via a state reconciliation loop (poll every 30 seconds). (c) member join/leave events are propagated: Matrix → AS → your system (add/remove participant). (3) **presence bridging**: (a) your users' presence (online/offline/idle) is mapped to Matrix presence (presence: online/offline/unavailable) and sent to the Matrix federation. (b) Matrix users' presence is polled via the Matrix CS API and mapped to your presence store. (c) rate-limit presence updates to 1 per 30 seconds per user to avoid flooding the federation. (4) **E2EE bridging**: (a) the bridge acts as a **trusted relay**: it decrypts Matrix Olm/Megolm messages (using its own device keys), then re-encrypts with your system's E2EE protocol. (b) the bridge's keys are shared with both sides: Matrix users see the bridge as a user who can decrypt messages. Your users see the bridge as a regular user. (c) for high-security deployments, use **transparent relay**: the bridge does not decrypt; instead, it passes the Matrix-encrypted payload as a binary attachment in your system. Users in both systems need a custom client that can decrypt the other system's messages. (5) **rate limiting**: the bridge enforces per-user rate limits (10 messages/second/user) to prevent one system from flooding the other. (6) **monitoring** — `bridged_messages_per_second`, `bridge_latency_p99`, `bridge_failure_rate` (messages that failed to bridge). Target: <1% failure rate, <500ms p99 latency.
+
+---
 

@@ -2,111 +2,41 @@
 
 ## Q1: When designing a large-scale DNS resolver for a web crawler processing 100,000 pages per second, what is the primary architectural bottleneck of relying on the local OS standard getaddrinfo call?
 
-**Options:**
-
-- It lacks support for IPv6 address resolution schemas.
-- It is typically a synchronous, blocking network system call that binds an entire application execution thread for the duration of the network lookup.
-- It automatically compresses DNS payloads, which corrupts the destination IP parsing masks.
-- It forces the crawler to communicate strictly via TCP rather than UDP routes.
-
 **Answer:** It is typically a synchronous, blocking network system call that binds an entire application execution thread for the duration of the network lookup.
 
 ## Q2: To effectively minimize space requirements when tracking whether trillions of unique URLs have been visited, which distributed data structure represents the best memory trade-off?
-
-**Options:**
-
-- A globally synchronized relational database index table using B+Trees.
-- A Scalable Distributed Bloom Filter or cuckoo filter kept in high-density cluster memory.
-- An append-only text file distributed across a Hadoop Distributed File System (HDFS) pool.
-- A centralized Radix Tree stored entirely within a single master node's memory space.
 
 **Answer:** A Scalable Distributed Bloom Filter or cuckoo filter kept in high-density cluster memory.
 
 ## Q3: A web crawler encounters a 'spider trap' (e.g., a dynamically generated calendar loop that produces infinite paths like /year/2026/month/06/day/23...). What strategy best protects the crawler from resource exhaustion?
 
-**Options:**
-
-- Relying purely on the HTTP timeout layer to break connection sockets automatically.
-- Enforcing strict URL length boundaries and tracking structural repetition count anomalies per domain using a combination of page depth constraints and URL structure analytics.
-- Clearing the DNS cache every time the crawl path exceeds twenty deep branches.
-- Switching the downloader from GET requests to HEAD requests for all subdirectory layers.
-
 **Answer:** Enforcing strict URL length boundaries and tracking structural repetition count anomalies per domain using a combination of page depth constraints and URL structure analytics.
 
 ## Q4: To implement strict 'Politeness' compliance across a distributed cluster of independent crawling nodes, how should the URL Frontier be structurally coordinated?
-
-**Options:**
-
-- Each worker node randomizes its execution sleep timings between individual fetch operations globally.
-- Map hostnames to specific Back Queues via a hashing mechanism, and use a centralized broker or distributed lock manager to ensure a single Back Queue is only polled by one worker thread at a time.
-- Force all worker nodes to route traffic through a shared centralized proxy gateway that drops concurrent packets.
-- Implement a distributed two-phase commit across all worker instances before issuing any HTTP request.
 
 **Answer:** Map hostnames to specific Back Queues via a hashing mechanism, and use a centralized broker or distributed lock manager to ensure a single Back Queue is only polled by one worker thread at a time.
 
 ## Q5: When extracting hyperlinks from downloaded HTML pages, why is near-duplicate content detection (e.g., using SimHash) performed *before* parsing out the outbound anchor links?
 
-**Options:**
-
-- SimHash requires the raw, unparsed HTML byte stream to compute cryptographic bit patterns.
-- If a page is flagged as a near-duplicate of an already processed document, extracting its links is redundant and would pollute the URL Frontier with duplicate crawl paths.
-- Parsing anchor links mutates the document structure, which invalidates the underlying TCP socket checksum flags.
-- SimHash algorithms automatically fix broken HTML tags to accelerate downstream DOM query processing.
-
 **Answer:** If a page is flagged as a near-duplicate of an already processed document, extracting its links is redundant and would pollute the URL Frontier with duplicate crawl paths.
 
 ## Q6: How should a distributed web crawler handle a server's robots.txt file to balance politeness compliance with high-throughput performance?
-
-**Options:**
-
-- Download and parse the robots.txt file for every single URL fetch request to ensure real-time compliance.
-- Download the robots.txt file once per domain, parse its rules into an optimal in-memory trie structure, cache it locally with a reasonable TTL, and validate URLs against this cache before fetching.
-- Download the file only when the target web server returns an HTTP 403 Forbidden status code response.
-- Incorporate robots.txt rules directly into the global DNS resolution packet payload flags.
 
 **Answer:** Download the robots.txt file once per domain, parse its rules into an optimal in-memory trie structure, cache it locally with a reasonable TTL, and validate URLs against this cache before fetching.
 
 ## Q7: What is the primary architectural trade-off when configuring your crawler's HTML fetcher to execute client-side JavaScript using headless browser instances (e.g., Playwright or Headless Chrome) versus basic HTTP raw HTML clients?
 
-**Options:**
-
-- Headless browsers require less network bandwidth because they compress structural style assets naturally.
-- Headless browsers enable the crawling of dynamic single-page applications (SPAs), but they increase memory and CPU consumption by orders of magnitude, lowering throughput.
-- Raw HTTP clients are incapable of parsing standard text compressions like GZIP or Brotli payloads.
-- Headless browsers eliminate the requirement for managing URL Frontier queues due to their internal cache structures.
-
 **Answer:** Headless browsers enable the crawling of dynamic single-page applications (SPAs), but they increase memory and CPU consumption by orders of magnitude, lowering throughput.
 
 ## Q8: When storing crawled web page contents across a distributed storage cluster, why are large wide-column stores (like HBase) or object stores (like AWS S3) chosen over standard file systems storing individual raw HTML files?
-
-**Options:**
-
-- Standard file systems lack the cryptographic security protocols necessary to isolate crawled text data partitions.
-- Storing billions of tiny individual files creates severe metadata allocation bottlenecks (inode exhaustion) and slows directory listing speeds to a crawl on standard operating systems.
-- Object stores automatically execute deep neural net semantic text parsing during the write stream.
-- Wide-column stores enforce strict synchronous transactions that lock out web crawler nodes during read operations.
 
 **Answer:** Storing billions of tiny individual files creates severe metadata allocation bottlenecks (inode exhaustion) and slows directory listing speeds to a crawl on standard operating systems.
 
 ## Q9: If your distributed web crawler nodes suddenly begin experiencing high rates of HTTP 429 Too Many Requests errors from a target cluster, which architectural adjustments should the URL Frontier immediately implement?
 
-**Options:**
-
-- Double the number of concurrent fetch threads assigned to that host to clear out the queue before it overflows.
-- Dynamically increase the back-off delay multiplier (e.g., using exponential back-off) for that specific host's Back Queue and decrease its maximum concurrency limits.
-- Immediately pivot all requests to target the system's staging environment servers instead.
-- Flush the local Bloom Filter tracking structures to force a complete re-crawl from the root seed node.
-
 **Answer:** Dynamically increase the back-off delay multiplier (e.g., using exponential back-off) for that specific host's Back Queue and decrease its maximum concurrency limits.
 
 ## Q10: In a distributed crawler using a master/worker topology, what happens if the master node crashes while managing the URL Frontier allocations?
-
-**Options:**
-
-- The workers will continue fetching data uninterrupted forever by generating random memory link strings.
-- A single point of failure (SPOF) condition triggers unless the master state is backed up continuously via distributed consensus logs (e.g., Raft), allowing a standby follower to assume leadership.
-- The storage engines will automatically transition into read-only mode across all data center zones.
-- The network gateway infrastructure shifts all active worker sockets to target local loopback channels.
 
 **Answer:** A single point of failure (SPOF) condition triggers unless the master state is backed up continuously via distributed consensus logs (e.g., Raft), allowing a standby follower to assume leadership.
 
@@ -151,4 +81,65 @@
 ## Q20: Your 10,000-node distributed crawler fleet is running at 40% CPU utilization, but your network bandwidth is fully saturated, and the URL Frontier is growing faster than it can be consumed. The bottleneck is not CPU or memory — it's network egress from your data center. How do you redesign the system to work within a fixed bandwidth budget?
 
 **Answer:** This is a **bandwidth-constrained scheduling problem** — the bottleneck has shifted from computation to network egress. Redesign: (1) **admission control** — implement a **token bucket for bandwidth** at the data center level. Each crawl request must "spend" bandwidth tokens proportional to the expected response size (estimated from the Content-Length header or historical average for the domain). If the bucket is empty, the request is queued. (2) **response size capping** — for large pages (>1MB), truncate to the first 500KB (most inverted-index-relevant content is above the fold). Use `Range: bytes=0-524288` header. This reduces per-request bandwidth by 50% for the heaviest 1% of pages. (3) **binary resource skipping** — skip fetching URLs that are likely binary resources (images, PDFs, .zip, .exe) unless specifically configured. These consume bandwidth but produce no indexable text. Check the Content-Type from a HEAD request before GET (costs one small request but saves huge bandwidth). (4) **delta crawling** — for frequently-recrawled pages, use HTTP ETag / If-Modified-Since. On re-crawl, if the server returns 304 Not Modified (no change), the bandwidth cost is ~500 bytes instead of 50KB. With 40% of pages unchanged on each recrawl, this saves ~40% of bandwidth. (5) **geographic distribution** — deploy crawl workers in multiple data centers closer to the target websites. A crawler in Frankfurt crawling a German site uses less WAN bandwidth than one in us-east-1. Use a **geo-aware scheduler** that assigns crawl jobs to the nearest data center to the target. (6) **compression** — use HTTP/2 or gzip compression. Most servers already compress; configure the client to prefer gzip/brotli and increase the compression window size. (7) **bandwidth monitoring** — per-worker, per-domain, and per-datacenter bandwidth dashboards. Set hard limits: total egress must not exceed 95% of provisioned capacity. When approaching the limit, prioritize high-value domains (by PageRank or user-traffic-weighted importance) and deprioritize long-tail.
+
+
+## Q21: How do you implement a politeness delay system that respects per-domain crawl-delay across millions of domains while maximizing throughput? Design the distributed scheduler.
+
+**Answer:** **Hierarchical politeness scheduler**: (1) **per-domain back-pressure queue** — each domain has a dedicated queue (backed by Kafka, partitioned by `domain_hash % 1024`). The queue holds URLs to crawl for that domain. A **single consumer** per partition processes the queue, enforcing the domain's `crawl-delay` via a token bucket (rate limiter). (2) **dynamic delay adjustment** — monitor HTTP response codes: if the server returns 429 (Too Many Requests), double the crawl delay and back off exponentially. If the server returns 200 consistently for N requests, gradually halve the delay back to the configured minimum. (3) **distributed token bucket** — the token bucket state for each domain is stored in Redis (key: `politeness:{domain}`, value: `{tokens, last_refill_timestamp}`). Each worker borrows tokens before issuing a request. If tokens are exhausted, the worker moves to the next domain. (4) **workers are fungible** — any worker can process any domain's queue. They pull the next available URL from the queue with the earliest "available time" (computed as `last_fetch_time + crawl_delay`). This ensures politeness even if workers restart. (5) **domain grouping** — for small domains with few URLs (<100/day), group them into a "batch domain" with a shared rate limit. This reduces the overhead of maintaining per-domain state for millions of low-traffic domains. (6) **monitoring** — `politeness_violations` (requests sent before the crawl-delay elapsed). Target zero. If >0, the scheduler has a bug.
+
+---
+
+## Q22: How do you handle JavaScript rendering for SPAs at scale? Design a headless browser farm that can render 100K pages per hour per node.
+
+**Answer:** **Rendering farm with browser reuse**: (1) **headless browser pool** — each node runs a pool of headless Chromium instances (or Playwright). Pool size = CPU cores × 2 (e.g., 64-core machine → 128 browser instances). Each instance renders one page at a time. (2) **connection reuse** — reuse the same browser instance for multiple pages from the same domain (same origin). Browsers maintain session state, cookies, and cache across navigations, making rendering faster. (3) **selective rendering** — for URLs known to be static (from previous crawls or known CMS patterns), skip JS rendering entirely — fetch HTML directly. Only use the headless browser for pages with JS-rendered content (detected by: `<script>` tags, `data-*` attributes for React/Vue, or explicit site configuration). (4) **rendering timeout** — set a 10-second timeout per page. If the page hasn't finished rendering, capture the current DOM (partial render) and move on. This prevents a SPA with infinite loading from blocking the pool. (5) **resource limits** — per-browser limits: max 1GB memory, max 100 network requests per page. Pages exceeding limits are killed. (6) **result caching** — cache rendered HTML by URL + user-agent fingerprint. If the same URL is revisited within 24 hours, return cached HTML without re-rendering. (7) **monitoring** — `render_p99`, `render_success_rate` (pages that rendered within timeout), `browser_crashes_per_hour`. Target: >95% render success rate, <10 browser crashes/hour per 1000 instances.
+
+---
+
+## Q23: How does SimHash near-duplicate detection work for web pages? How do you choose the fingerprint size and hamming distance threshold?
+
+**Answer:** **SimHash algorithm**: (1) each document is tokenized into features (words, n-grams, shingles). (2) each feature is hashed into an f-bit fingerprint (e.g., 64 bits). (3) for each bit position, track a weighted sum: if the feature hash bit = 1, add the feature weight to that position; if 0, subtract. (4) after processing all features, the final fingerprint's bit = 1 if the sum for that position > 0, else 0. The result is an f-bit SimHash. Near-duplicate detection: two documents are near-duplicates if their SimHash fingerprints have a Hamming distance ≤ D (threshold). Tuning: (1) **fingerprint size** — 64 bits is standard. Larger (128-bit) gives finer granularity but more storage. Smaller (32-bit) risks false positives. (2) **Hamming distance threshold** — start at D=3 for 64-bit (equivalent to ~85% similarity). Tune by sampling: label 1000 document pairs as "duplicate" or "not duplicate" by human reviewers. Plot precision/recall vs D. Choose D that gives >90% recall with <1% false positive rate. (3) **performance** — comparing each new fingerprint against all existing fingerprints is O(N). Optimize by partitioning fingerprints into **shards by the first 16 bits**: only compare within the same shard (since similar documents share the same prefix for close Hamming distances). This reduces comparisons by 256×. (4) **real-world** — at Google, SimHash with 64-bit fingerprints and D=3 achieves >95% recall on web duplicates.
+
+---
+
+## Q24: Design an incremental crawling system that determines re-crawl frequency per page based on change rate. How do you balance freshness against crawl budget?
+
+**Answer:** **Adaptive re-crawl scheduler**: (1) **change rate estimation** — for each page, track the last N modification timestamps (from `Last-Modified` header or ETag changes). Model the change interval as a Poisson process: `expected_change_rate = N / time_window`. (2) **re-crawl frequency** — set re-crawl interval = `max(min_interval, min(max_interval, expected_change_rate × 0.5))`. A page that changes every hour → recrawl every 30 minutes. A page that changes never → recrawl every 30 days. (3) **freshness budget** — each domain has a crawl budget (e.g., 1000 pages per day). Allocate budget proportionally to change rates: a fast-changing page gets 10× the budget of a slow-changing one. (4) **importance weighting** — multiply frequency by page importance (PageRank, inbound link count). A high-importance page (homepage) recrawls more often than a low-importance page even if both change at the same rate. (5) **change detection via HTTP** — use `If-Modified-Since` or `ETag` for re-crawls. 90% of re-crawls return 304 Not Modified, costing only ~500 bytes of bandwidth instead of 50KB. (6) **monitoring** — `staleness_ratio` (fraction of served results from pages last crawled > 2× their expected change interval). Target < 5%.
+
+---
+
+## Q25: How do you cache and comply with robots.txt across a distributed crawler with 10K nodes? What happens when robots.txt changes?
+
+**Answer:** **Global robots.txt cache with invalidation**: (1) **per-domain policy store** — store parsed robots.txt rules in a distributed KV store (etcd or Cassandra). Key: `robots:{domain}`, value: structured rules (disallowed paths, crawl-delay, sitemap URLs), TTL: 1 hour. (2) **local cache** — each crawler node maintains an in-memory LRU cache of the last 10K domains' robots.txt rules. Cache TTL: 15 minutes (short enough to catch changes, long enough to avoid constant re-fetching). (3) **invalidation on change** — when a crawler fetches robots.txt and detects a change (ETag or content hash diff), it publishes an invalidation event to a global Kafka topic. All other nodes update their local caches. (4) **graceful handling of unavailability** — if robots.txt fetch returns 503 or times out, use the cached version (even if stale). If no cached version exists, use the **most restrictive default** (disallow everything) to avoid accidental violation. (5) **sitemap discovery** — parse `Sitemap:` directives in robots.txt. Store sitemap URLs in the policy entry. Crawl sitemaps to discover new URLs (more efficient than following links). (6) **compliance audit** — log every robots.txt check: `sha256(parsed_rules)`. The compliance team can replay the log to verify that every crawl request had a corresponding robots.txt check. (7) **monitoring** — `robots_txt_fetch_latency`, `robots_txt_cache_hit_ratio` (target >99%), `robots_txt_violation_count` (requests to disallowed paths — must be zero).
+
+---
+
+## Q26: Design a crawl frontier priority system that balances importance (PageRank) and freshness (recrawl time). How do you prevent low-importance pages from starving?
+
+**Answer:** **Multi-queue priority scheduler**: (1) **priority levels** — define K priority queues (e.g., Q1: critical, Q2: high, Q3: normal, Q4: low, Q5: background). Each URL is assigned a priority score: `score = α × importance + β × freshness_urgency + γ × source_trust`. Importance: PageRank or domain authority. Freshness urgency: `time_since_last_crawl / expected_change_interval`. (2) **weighted fair queuing** — each priority queue has a guaranteed minimum bandwidth (e.g., Q1: 10%, Q2: 20%, Q3: 30%, Q4: 25%, Q5: 15%). Within a priority, URLs are sorted by score. The scheduler draws from queues in proportion to their weights. If Q1 is empty, its bandwidth is redistributed to Q2, etc. (3) **starvation prevention** — monitor `max_wait_time_per_queue`. If Q4 URLs are waiting > 1 hour, steal 5% from Q1's allocation. This ensures no queue is completely starved. (4) **dynamic re-prioritization** — if a low-priority URL receives an unexpected number of new inbound links (detected during crawl), promote it to a higher priority. (5) **freshness override** — if a Q5 URL's `time_since_last_crawl` exceeds `max_interval` (e.g., 30 days), promote it to Q3 (force a recrawl even if importance is low). (6) **monitoring** — `frontier_depth_per_queue`, `max_wait_time_per_queue`. Alert if any queue depth grows > 1B URLs (indicates crawler throughput is insufficient for the discovery rate).
+
+---
+
+## Q27: How do you implement URL canonicalization and normalization to avoid crawling duplicate content (e.g., `example.com/page` vs `example.com/Page` vs `example.com/page?ref=123`)?
+
+**Answer:** **Multi-step normalization pipeline**: (1) **scheme normalization** — convert `http://` to canonical scheme (typically `https://`). (2) **host normalization** — lowercase the hostname, remove `www.` prefix (or add it — pick one convention), decode IDN (internationalized domain names) to ASCII (Punycode). (3) **path normalization** — remove `../` and `./` sequences, decode percent-encoded characters (except reserved chars), remove duplicate slashes, convert to lowercase path (if case-insensitive server). (4) **query parameter normalization** — sort query params alphabetically, remove known tracking params (`utm_source`, `fbclid`, `gclid`, `ref`), remove empty-value params. (5) **fragment removal** — strip `#fragment` (fragments are client-side only, not sent to server). (6) **canonical tag respect** — if the page's HTML contains `<link rel="canonical" href="...">`, use that as the canonical URL. The non-canonical variants are not crawled. (7) **fingerprint storage** — store the canonical URL's SHA-256 in a Bloom filter (100B URLs × 10 bits = 125GB). Before adding any URL to the frontier, normalize it and check the Bloom filter. If already exists, skip. This prevents 99.9% of duplicate crawl attempts. (8) **monitoring** — `normalization_dedup_rate` (number of URLs skipped as duplicates / total frontier entries). Target > 20% (high dedup = good normalization). If < 5%, the normalization rules need updating.
+
+---
+
+## Q28: Discuss the ethics and engineering of evading CAPTCHA and IP blocking in web crawling. How do you design a crawler that respects site policies while achieving its goals?
+
+**Answer:** **Ethical compliance framework**: (1) **robots.txt first** — always respect `Disallow` directives. If the site explicitly blocks crawling via robots.txt, do not crawl. (2) **no CAPTCHA bypass** — do not implement CAPTCHA-solving services (e.g., 2Captcha). CAPTCHAs are a clear signal that the site does not consent to automated crawling. If a site presents a CAPTCHA, stop crawling that site and document the block. (3) **IP rotation vs proxy ethics** — use datacenter proxy IPs, not residential proxies (residential proxies bypass geo-restrictions and may violate the owner's ISP terms). Rate-limit to 1 request per 5 seconds per IP — this respects the site's resources regardless of legal requirements. (4) **legal review** — before crawling any site, check: (a) is there a terms of service that explicitly prohibits crawling? (b) is the content copyrighted? (c) is the site behind a login wall? If any answer is yes, seek legal review before proceeding. (5) **transparency** — identify the crawler via a descriptive `User-Agent` header (e.g., `MyCrawler/1.0 (+https://my.site/bot)`). Provide a web page explaining the crawler's purpose and a contact for site owners to opt out. (6) **rate limiting with apology** — if the site returns 429, obey the `Retry-After` header literally. Do not accelerate after a block. (7) **principal rule**: if the site does not want to be crawled, don't crawl it. The ethical crawler is cooperative, not adversarial. Engineering a crawler that bypasses blocks is engineering a DoS tool, not a search engine.
+
+---
+
+## Q29: Design a distributed URL frontier using consistent hashing. How do you handle node addition/removal without major frontier redistribution?
+
+**Answer:** **Consistent hash ring with virtual nodes**: (1) **ring construction** — create a hash ring with 4096 virtual nodes (tokens). Each crawler node is assigned N virtual nodes (N = `total_tokens / number_of_nodes`). The URL's `domain_hash` is placed on the ring, and the next K virtual nodes in clockwise order are responsible for that URL. (2) **queue ownership** — each virtual node owns a queue partition (Kafka partition or Pulsar topic). The URL is routed to the owning partition. The partition is consumed by the node that owns the closest virtual node. (3) **node addition** — when a new node joins, it takes ownership of some virtual nodes (transfer from existing nodes). Only the URLs in the transferred virtual nodes need to be reassigned. For a ring with 4096 tokens and 100 nodes, adding 1 node causes ~40 tokens to move → ~1% of URLs reassigned. (4) **node removal** — when a node leaves (planned or crash), its virtual nodes are temporarily reassigned to the next alive node. The reassigned URLs are in a `pending` state — the frontier does not dispatch them until the new owner confirms readiness. (5) **graceful takeover** — during reassignment, the original owner continues processing its URLs until the new owner confirms it has picked up the queue. This ensures zero URL loss. (6) **stateful frontier** — the frontier is not just a queue; it also tracks `last_crawl_time` per URL to enforce politeness. This state is stored in Redis (sharded by virtual node) and moves with the virtual node during reassignment. (7) **monitoring** — `frontier_rebalance_lag` (time for URLs to be reassigned after a topology change). Target < 10 seconds.
+
+---
+
+## Q30: Design a content extraction algorithm that extracts the main article body from a noisy HTML page (ads, navigation, sidebars). How do you handle diverse page layouts?
+
+**Answer:** **DOM-based content extraction with Readability algorithm**: (1) **DOM preprocessing** — convert HTML to a clean DOM tree. Remove non-content elements: `<script>`, `<style>`, `<nav>`, `<footer>`, `<header>`, `<aside>`, `<iframe>`, comments. (2) **content scoring** — for each paragraph-like element (`<p>`, `<div>` with text), compute a **content score**: `score = text_length + link_density_penalty`. Link density = `link_text_length / total_text_length`. High link density → low score (likely navigation). (3) **tree traversal** — walk up the DOM tree from high-scoring nodes. The node with the highest cumulative score is the likely content container. This is the approach used by Mozilla's Readability.js (used by Firefox Reader Mode). (4) **features beyond text** — consider: image count (articles have images), code blocks (technical articles), table of contents, headings (h1-h3 count). A node with 5+ paragraphs, 2+ images, and a heading is very likely the main content. (5) **fallback strategies** — if no container is found (e.g., single-page apps with minimal DOM), fall back to: (a) `<article>` tag content; (b) element with `role="main"`; (c) `<div id="content">` or similar common class names; (d) the largest text block on the page (by character count). (6) **post-processing** — clean the extracted content: remove empty paragraphs, normalize whitespace, convert relative URLs to absolute, extract the first image as a lead image. (7) **evaluation** — benchmark against a dataset of 1000 manually-labeled pages. Target: >90% F1 score for content extraction (correctly identifying the article body). Monitor `extraction_success_rate` in production.
+
+---
 
